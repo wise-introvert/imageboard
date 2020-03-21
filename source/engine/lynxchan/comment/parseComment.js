@@ -22,11 +22,15 @@ export default function parseComment(post, {
 	defaultAuthorName,
 	capcode
 }) {
-	// `post.markdown` is not really "markdown", it's HTML.
-	// `lynxchan` has a bug of inserting "carriage return" (U+000D)
-	// characters before every "new line" (<br>).
-	// This workaround fixes that:
-	const content = post.markdown.replace(/\u000d/g, '')
+	const content = post.markdown
+		// `post.markdown` is not really "markdown", it's HTML.
+		// `lynxchan` has a bug of inserting "carriage return" (U+000D)
+		// characters before every "new line" (<br>).
+		// This workaround fixes that.
+		.replace(/\u000d/g, '')
+		// Since Lynxchan 2.3, all line breaks have been changed from `<br/>` to `\n`.
+		// That's a weird change, but whatever, I'll just replace all `\n`s with `<br>`s.
+		.replace(/\n/g, '<br>')
 	const authorRole = parseAuthorRole(post, { capcode })
 	const author = parseAuthor(post.name, { defaultAuthorName, boardId })
 	const comment = {
