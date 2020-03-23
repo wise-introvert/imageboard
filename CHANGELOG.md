@@ -1,3 +1,10 @@
+0.4.18 / 23.03.2020
+==================
+
+* Fixed LynxChan parser replacing all `\n`-s with `<br>`s in `<code>` and `<span class="aa">`.
+
+* Fixed Kohlchan multiline `<code>`.
+
 0.4.17 / 22.03.2020
 ==================
 
