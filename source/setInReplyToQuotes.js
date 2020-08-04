@@ -255,7 +255,7 @@ function stripLinks(content) {
 }
 
 const DEFAULT_GENERATED_QUOTE_MAX_LENGTH = 180
-const DEFAULT_GENERATED_QUOTE_FIT_FACTOR = 1.35
+// const DEFAULT_GENERATED_QUOTE_FIT_FACTOR = 1.35
 
 export function getGeneratePostQuoteOptions({
 	messages,
@@ -265,8 +265,9 @@ export function getGeneratePostQuoteOptions({
 	return {
 		messages,
 		maxLength: generatedQuoteMaxLength || DEFAULT_GENERATED_QUOTE_MAX_LENGTH,
+		fitFactor: generatedQuoteFitFactor
 		// `fitFactor` could be `0`.
-		fitFactor: generatedQuoteFitFactor === undefined ? DEFAULT_GENERATED_QUOTE_FIT_FACTOR : generatedQuoteFitFactor
+		// fitFactor: generatedQuoteFitFactor === undefined ? DEFAULT_GENERATED_QUOTE_FIT_FACTOR : generatedQuoteFitFactor
 	}
 }
 
