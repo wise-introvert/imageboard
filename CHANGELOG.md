@@ -1,3 +1,18 @@
+0.4.21 / 06.08.2020
+==================
+
+* Renamed `setInReplyToQuotes` to `setPostLinkQuotes`.
+
+0.4.20 / 05.08.2020
+==================
+
+* Fixed `lynxchan` bug: `file.originalName` isn't present in `catalog.json` API response.
+
+0.4.19 / 05.08.2020
+==================
+
+* Fixed `makaba` voting API url.
+
 0.4.18 / 23.03.2020
 ==================
 

@@ -9,7 +9,8 @@ export default function Thread(thread, comments, {
 	messages,
 	censoredWords,
 	generatedQuoteMaxLength,
-	generatedQuoteFitFactor,
+	generatedQuoteMinFitFactor,
+	generatedQuoteMaxFitFactor,
 	commentLengthLimit,
 	commentUrlParser,
 	expandReplies,
@@ -95,7 +96,8 @@ export default function Thread(thread, comments, {
 					getCommentById,
 					messages,
 					generatedQuoteMaxLength,
-					generatedQuoteFitFactor,
+					generatedQuoteMinFitFactor,
+					generatedQuoteMaxFitFactor,
 					commentLengthLimit,
 					expandReplies
 				})
@@ -123,7 +125,8 @@ export default function Thread(thread, comments, {
 				getCommentById,
 				messages,
 				generatedQuoteMaxLength,
-				generatedQuoteFitFactor,
+				generatedQuoteMinFitFactor,
+				generatedQuoteMaxFitFactor,
 				commentLengthLimit
 			})
 		}
