@@ -15,6 +15,7 @@ import setPostLinksDefaultText from './setPostLinksDefaultText'
  * @param {number} [options.generatedQuoteMaxLength]
  * @param {number} [options.generatedQuoteMinFitFactor]
  * @param {number} [options.generatedQuoteMaxFitFactor]
+ * @param {number} [options.generatedQuoteNewLineCharacterLength]
  * @param {number} options.commentLengthLimit
  * @return {boolean} [contentDidChange] Returns `true` if `comment`'s content has changed.
  */
@@ -25,6 +26,7 @@ export function generatePostLinksAndUpdatePreview(comment, {
 	generatedQuoteMaxLength,
 	generatedQuoteMinFitFactor,
 	generatedQuoteMaxFitFactor,
+	generatedQuoteNewLineCharacterLength,
 	commentLengthLimit,
 	hasBeenCalledBefore,
 	isParentCommentUpdate
@@ -54,7 +56,8 @@ export function generatePostLinksAndUpdatePreview(comment, {
 			messages,
 			generatedQuoteMaxLength,
 			generatedQuoteMinFitFactor,
-			generatedQuoteMaxFitFactor
+			generatedQuoteMaxFitFactor,
+			generatedQuoteNewLineCharacterLength
 		})) {
 			contentDidChange = true
 		}
@@ -78,6 +81,7 @@ export function generatePostLinksAndUpdatePreview(comment, {
  * @param {number} [options.generatedQuoteMaxLength]
  * @param {number} [options.generatedQuoteMinFitFactor]
  * @param {number} [options.generatedQuoteMaxFitFactor]
+ * @param {number} [options.generatedQuoteNewLineCharacterLength]
  * @param {number} options.commentLengthLimit
  * @param {boolean} [options.expandReplies] — `expandReplies` option of `imageboard` constructor.
  */
@@ -89,6 +93,7 @@ export function addParseContent(comment, {
 	generatedQuoteMaxLength,
 	generatedQuoteMinFitFactor,
 	generatedQuoteMaxFitFactor,
+	generatedQuoteNewLineCharacterLength,
 	commentLengthLimit,
 	expandReplies,
 	parseCommentContent
@@ -108,6 +113,7 @@ export function addParseContent(comment, {
 			generatedQuoteMaxLength,
 			generatedQuoteMinFitFactor,
 			generatedQuoteMaxFitFactor,
+			generatedQuoteNewLineCharacterLength,
 			commentLengthLimit,
 			hasBeenCalledBefore,
 			isParentCommentUpdate
@@ -170,6 +176,7 @@ export function addParseContent(comment, {
 							generatedQuoteMaxLength,
 							generatedQuoteMinFitFactor,
 							generatedQuoteMaxFitFactor,
+							generatedQuoteNewLineCharacterLength,
 							generateQuotes: false
 						}
 					)
@@ -193,7 +200,8 @@ export function addParseContent(comment, {
 						// maximum of the two, and their `fitFactor`s are the same.
 						generatedQuoteMaxLength,
 						generatedQuoteMinFitFactor,
-						generatedQuoteMaxFitFactor
+						generatedQuoteMaxFitFactor,
+						generatedQuoteNewLineCharacterLength
 					}))) {
 						_canGeneratePostQuoteIgnoringNestedPostQuotes = true
 						// Don't parse `inReplyTo` comments for this "non-exhaustive" parse.
@@ -258,6 +266,7 @@ export function addParseContent(comment, {
 						generatedQuoteMaxLength,
 						generatedQuoteMinFitFactor,
 						generatedQuoteMaxFitFactor,
+						generatedQuoteNewLineCharacterLength,
 						generateBlockQuotes: false
 					}
 				)

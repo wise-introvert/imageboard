@@ -15,6 +15,7 @@ import getPostLinkDefaultText from './getPostLinkDefaultText'
  * @param {number} [options.generatedInlineQuoteMaxLength] — Is `generatedQuoteMaxLength / 2` by default.
  * @param {number} [options.generatedQuoteMinFitFactor] — Provides some flexibility on generated quote `maxLength`. Sets the usual lower limit of content trimming length at `minFitFactor * maxLength`: if content surpasses `maxFitFactor * maxLength` limit, then it usually can be trimmed anywhere between `minFitFactor * maxLength` and `maxFitFactor * maxLength`. Is `1` by default, meaning "no effect".
  * @param {number} [options.generatedQuoteMaxFitFactor] — Provides some flexibility on generated quote `maxLength`. Sets the usual upper limit of content trimming length at `maxFitFactor * maxLength`: if content surpasses `maxFitFactor * maxLength` limit, then it usually can be trimmed anywhere between `minFitFactor * maxLength` and `maxFitFactor * maxLength`. Is `1` by default, meaning "no effect".
+ * @param {number} [options.generatedQuoteNewLineCharacterLength] — "\n" character "length" (related to `generatedQuoteMaxLength`) when autogenerating quote. Is something like `30` by default.
  * @param {object} contentParent — Shouldn't be passed. Is only passed internally when recursing. The parent block of `content` block.
  * @param {boolean} isLastInParagraph — If the `content` block is the last one in `contentParent`.
  * @return {boolean} [contentDidChange] — Returns `true` if `content` did change (either as a result of setting an in-reply-to quote or as a result of setting "deleted post"/"hidden post" flag).
@@ -250,13 +251,15 @@ export function getGeneratePostQuoteOptions({
 	messages,
 	generatedQuoteMaxLength,
 	generatedQuoteMinFitFactor,
-	generatedQuoteMaxFitFactor
+	generatedQuoteMaxFitFactor,
+	generatedQuoteNewLineCharacterLength
 }) {
 	return {
 		messages,
 		maxLength: generatedQuoteMaxLength || DEFAULT_GENERATED_QUOTE_MAX_LENGTH,
 		minFitFactor: generatedQuoteMinFitFactor,
-		maxFitFactor: generatedQuoteMaxFitFactor
+		maxFitFactor: generatedQuoteMaxFitFactor,
+		newLineCharacterLength: generatedQuoteNewLineCharacterLength
 	}
 }
 

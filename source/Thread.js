@@ -11,6 +11,7 @@ export default function Thread(thread, comments, {
 	generatedQuoteMaxLength,
 	generatedQuoteMinFitFactor,
 	generatedQuoteMaxFitFactor,
+	generatedQuoteNewLineCharacterLength,
 	commentLengthLimit,
 	commentUrlParser,
 	expandReplies,
@@ -98,6 +99,7 @@ export default function Thread(thread, comments, {
 					generatedQuoteMaxLength,
 					generatedQuoteMinFitFactor,
 					generatedQuoteMaxFitFactor,
+					generatedQuoteNewLineCharacterLength,
 					commentLengthLimit,
 					expandReplies
 				})
@@ -127,6 +129,7 @@ export default function Thread(thread, comments, {
 				generatedQuoteMaxLength,
 				generatedQuoteMinFitFactor,
 				generatedQuoteMaxFitFactor,
+				generatedQuoteNewLineCharacterLength,
 				commentLengthLimit
 			})
 		}
