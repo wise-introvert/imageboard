@@ -1,3 +1,8 @@
+0.4.22 / 08.08.2020
+==================
+
+* Added `generatedQuoteNewLineCharacterLength: number?` option.
+
 0.4.21 / 06.08.2020
 ==================
 
