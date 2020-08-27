@@ -6,7 +6,10 @@ import parseThread from './parseThread'
  * @return {object} `{ threads, comments }`
  */
 export default function parseThreadsResponse(response) {
-	const threads = response.reduce((all, page) => all.concat(page.threads), [])
+	// `page.threads || []` works around a `8ch.net` issue:
+	// When there're no threads on a board, the `catalog.json`
+	// doesn't have any `threads` property: `[{"page":0}]`.
+	const threads = response.reduce((all, page) => all.concat(page.threads || []), [])
 	return {
 		threads: threads.map(parseThread),
 		comments: threads
