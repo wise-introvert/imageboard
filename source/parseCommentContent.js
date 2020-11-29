@@ -1,4 +1,5 @@
 import censorWords from 'social-components/commonjs/utility/post/censorWords'
+import getContentText from 'social-components/commonjs/utility/post/getContentText'
 
 import parseAndFormatComment from './parseAndFormatComment'
 
@@ -37,7 +38,8 @@ export default function parseCommentContent(comment, {
 		if (censoredWords) {
 			const titleCensored = censorWords(comment.title, censoredWords)
 			if (titleCensored !== comment.title) {
-				comment.titleCensored = titleCensored
+				comment.titleCensoredContent = titleCensored
+				comment.titleCensored = getContentText(titleCensored)
 			}
 		}
 	}

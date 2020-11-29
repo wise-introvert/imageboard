@@ -1,4 +1,4 @@
-import getPostText from 'social-components/commonjs/utility/post/getPostText'
+import getContentText from 'social-components/commonjs/utility/post/getContentText'
 import generatePostQuote from 'social-components/commonjs/utility/post/generatePostQuote'
 import trimText from 'social-components/commonjs/utility/post/trimText'
 import censorWords from 'social-components/commonjs/utility/post/censorWords'
@@ -46,7 +46,8 @@ export default function generateThreadTitle(thread, options = {}) {
 	if (thread.title && censoredWords) {
 		const titleCensored = censorWords(thread.title, censoredWords)
 		if (titleCensored !== thread.title) {
-			thread.titleCensored = getPostText(titleCensored)
+			thread.titleCensoredContent = titleCensored
+			thread.titleCensored = getContentText(titleCensored)
 		}
 	}
 }

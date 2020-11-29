@@ -459,7 +459,9 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // containing "censored" "spoilers" will be generated.
   // (with "spoilers" represented by "​░​" characters)
   titleCensored: string?,
-  // Comments in this thread.
+  // Same as `titleCensored` but is an `InlineContent` rather than a `string`.
+  titleCensoredContent: InlineContent?,
+  // The list of comments in this thread.
   // (including the main comment of the thread).
   comments: Comment[],
   // Is this thread "sticky" (pinned).
@@ -547,7 +549,10 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   title: string?,
   // If `title` contains ignored words then a censored title
   // containing "censored" "spoilers" will be generated.
-  titleCensored: InlineContent?,
+  // (with "spoilers" represented by "​░​" characters)
+  titleCensored: string?,
+  // Same as `titleCensored` but is an `InlineContent` rather than a `string`.
+  titleCensoredContent: InlineContent?,
   // The date on which the comment was posted.
   createdAt: Date,
   // "Last Modified Date".
@@ -696,7 +701,7 @@ Word pattern examples:
 
 Censored words in parsed comments' `content` will be replaced with `{ type: "spoiler", censored: true, content: "the-word-that-got-censored" }`.
 
-Censored words in comment/thread `title`s don't result in their replacement but rather a new `titleCensored` property is generated with the words censored. The rationale is that `title` is a `string`, not `Content`, therefore it should stay a `string`. `content`, on the other hand, is already of `Content` type so it's edited in-place.
+Censored words in comment/thread `title`s don't result in their replacement but rather a new `titleCensored` property is generated with the words censored. The rationale is that `title` is a `string` rather than `Content`, so it should stay a `string`; `content`, on the other hand, is already a `Content`, so it's edited in-place.
 
 ## Imageboard config
 
