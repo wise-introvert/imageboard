@@ -1,4 +1,4 @@
-import stringToColor from 'social-components/commonjs/utility/stringToColor'
+import getColorHash from 'social-components/commonjs/utility/getColorHash'
 
 export default function Comment({
 	boardId,
@@ -36,7 +36,7 @@ export default function Comment({
 	// Generate `authorIdColor` from `authorId` IP subnet address hash.
 	if (comment.authorId) {
 		if (!comment.authorIdColor) {
-			comment.authorIdColor = stringToColor(comment.authorId)
+			comment.authorIdColor = getColorHash(comment.authorId)
 		}
 	}
 	// Remove all `undefined` properties.
