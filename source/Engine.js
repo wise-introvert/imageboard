@@ -1,4 +1,4 @@
-import parseCommentContent from './parseCommentContent'
+import parseAndFormatCommentContent from './parseAndFormatCommentContent'
 
 export default class Engine {
 	constructor(chanSettings, {
@@ -227,7 +227,10 @@ export default class Engine {
 		if (!options.boardId || !options.threadId) {
 			console.error('`boardId` and `threadId` options are required when parsing thread comments.')
 		}
-		parseCommentContent(comment, this.getOptions(options))
+		comment.content = parseAndFormatCommentContent(comment.content, {
+			comment,
+			...this.getOptions(options)
+		})
 	}
 }
 

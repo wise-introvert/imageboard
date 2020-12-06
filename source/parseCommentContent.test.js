@@ -1,13 +1,13 @@
 import expectToEqual from './utility/expectToEqual'
 
-import parseComment from './parseComment'
+import parseCommentContent from './parseCommentContent'
 
 function parseCommentTest(comment, expected, expectedWarnings = []) {
 	const consoleWarn = console.warn
 	const warnings = []
 	console.warn = (text) => warnings.push(text)
 
-	const result = parseComment(comment, {
+	const result = parseCommentContent(comment, {
 		plugins: [
 			{
 				tag: 'strong',
@@ -28,7 +28,7 @@ function parseCommentTest(comment, expected, expectedWarnings = []) {
 	expectToEqual(result, expected)
 }
 
-describe('parseComment', () => {
+describe('parseCommentContent', () => {
 	it('should parse empty comments', () => {
 		parseCommentTest(
 			' ',
@@ -78,7 +78,7 @@ describe('parseComment', () => {
 
 	it('should match attributes', () => {
 		expectToEqual(
-			parseComment(
+			parseCommentContent(
 				'<div class="a">b</div>',
 				{
 					plugins: [
@@ -113,7 +113,7 @@ describe('parseComment', () => {
 
 	it('should match regular expression attributes', () => {
 		expectToEqual(
-			parseComment(
+			parseCommentContent(
 				'<div class="a a1 a2">b</div>',
 				{
 					plugins: [

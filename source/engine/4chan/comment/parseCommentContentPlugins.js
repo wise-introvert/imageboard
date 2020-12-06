@@ -38,7 +38,7 @@ export const underline = {
 // They have code tags in `/g/`.
 export const code = {
 	tag: 'pre',
-	parseContentText: true,
+	convertContentToText: true,
 	attributes: [
 		{
 			name: 'class',
@@ -76,6 +76,10 @@ export const quote = {
 
 export const link = {
 	tag: 'a',
+	// Link parser plugin uses `commentUrlParser()` function
+	// to detect links to other comments and extract
+	// `commentId`/`threadId`/`boardId` info from such links.
+	getOptions: ({ commentUrlParser }) => ({ commentUrlParser }),
 	createBlock(content, util, { commentUrlParser }) {
 		const href = util.getAttribute('href')
 		const postLink = parsePostLink(href, { commentUrlParser })

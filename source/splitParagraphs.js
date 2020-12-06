@@ -1,4 +1,4 @@
-import searchContent from 'social-components/commonjs/utility/post/searchContent'
+import findContentPart from 'social-components/commonjs/utility/post/findContentPart'
 import splitContent from 'social-components/commonjs/utility/post/splitContent'
 
 /**
@@ -37,18 +37,15 @@ const WHITESPACE = /^\s+$/
 
 function findParagraphSplit(content) {
 	let skip
-	const indexes = searchContent(content, function(part, parent, i) {
-		// Must be multi-part.
-		if (!parent) {
-			return
-		}
+	const indexes = findContentPart(content, (part, { getNextPart }) => {
 		if (part === '\n') {
 			skip = 1
-			while (i + skip < parent.length) {
-				if (parent[i + skip] === '\n') {
+			let nextPart
+			while ((nextPart = getNextPart(skip)) !== undefined) {
+				if (nextPart === '\n') {
 					return true
 				}
-				if (!WHITESPACE.test(parent[i + skip])) {
+				if (!WHITESPACE.test(nextPart)) {
 					return
 				}
 				skip++

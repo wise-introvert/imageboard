@@ -20,6 +20,7 @@ const emoji = {
 	],
 	// `kohlchan` emoji don't have `content`.
 	skipIfHasNoContent: false,
+	getOptions: ({ emojiUrl, toAbsoluteUrl }) => ({ emojiUrl, toAbsoluteUrl }),
 	createBlock(content, util, { emojiUrl, toAbsoluteUrl }) {
 		const url = util.getAttribute('src')
 		// "/.static/images/chen.png" -> "chen"
@@ -48,6 +49,10 @@ const quoteLinkLegacy1 = {
 		name: 'onclick',
 		value: /^highlightReply/
 	}],
+	// Link parser plugin uses `commentUrlParser()` function
+	// to detect links to other comments and extract
+	// `commentId`/`threadId`/`boardId` info from such links.
+	getOptions: ({ commentUrlParser }) => ({ commentUrlParser }),
 	createBlock: createPostLink
 }
 const quoteLinkLegacy2 = {
@@ -56,6 +61,10 @@ const quoteLinkLegacy2 = {
 		name: 'class',
 		value: 'highlightlink'
 	}],
+	// Link parser plugin uses `commentUrlParser()` function
+	// to detect links to other comments and extract
+	// `commentId`/`threadId`/`boardId` info from such links.
+	getOptions: ({ commentUrlParser }) => ({ commentUrlParser }),
 	createBlock: createPostLink
 }
 

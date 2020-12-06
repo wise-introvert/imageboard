@@ -1,27 +1,27 @@
 import PARSE_COMMENT_PLUGINS from './parseCommentContentPlugins.4chan'
 
 import expectToEqual from '../../../utility/expectToEqual'
-import parseComment from '../../../parseComment'
+import parseCommentContent from '../../../parseCommentContent'
 import splitParagraphs from '../../../splitParagraphs'
-import trimWhitespace from '../../../utility/trimWhitespace'
+import trimContent from '../../../utility/trimContent'
 
 function parseCommentTest(comment, expected, expectedWarnings = []) {
 	const consoleWarn = console.warn
 	const warnings = []
 	console.warn = (text) => warnings.push(text)
 
-	comment = parseComment(comment, {
+	let content = parseCommentContent(comment, {
 		plugins: PARSE_COMMENT_PLUGINS
 	})
 
 	console.warn = consoleWarn
 
-	comment = splitParagraphs(comment)
+	content = splitParagraphs(content)
 	// `content` internals will be mutated.
-	comment = trimWhitespace(comment)
+	content = trimContent(content)
 
 	expectToEqual(warnings, expectedWarnings)
-	expectToEqual(comment, expected)
+	expectToEqual(content, expected)
 }
 
 describe('parseComment', () => {

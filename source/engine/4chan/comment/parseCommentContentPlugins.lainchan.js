@@ -53,7 +53,7 @@ export const codeBlock = {
 const CODE_LANG_REGEXP = /\bhljs (\S+)$/
 export const code = {
 	tag: 'code',
-	parseContentText: true,
+	convertContentToText: true,
 	createBlock(content, utility) {
 		const result = {
 			type: 'code',

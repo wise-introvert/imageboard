@@ -1,11 +1,9 @@
-import parseComment from './parseComment'
+import parseCommentContent from './parseCommentContent'
 import splitParagraphs from './splitParagraphs'
 import postProcessCommentContent from './postProcessCommentContent'
-import trimWhitespace from 'social-components/commonjs/utility/post/trimWhitespace'
+import trimContent from 'social-components/commonjs/utility/post/trimContent'
 
-export default function parseAndFormatComment(rawComment, {
-	censoredWords,
-	filterText,
+export default function parseAndFormatCommentContent(rawComment, {
 	commentUrlParser,
 	parseCommentContentPlugins,
 	// These're used by `postProcessCommentContent`
@@ -17,9 +15,7 @@ export default function parseAndFormatComment(rawComment, {
 	emojiUrl,
 	toAbsoluteUrl
 }) {
-	let content = parseComment(rawComment, {
-		censoredWords,
-		filterText,
+	let content = parseCommentContent(rawComment, {
 		commentUrlParser,
 		emojiUrl,
 		toAbsoluteUrl,
@@ -31,7 +27,7 @@ export default function parseAndFormatComment(rawComment, {
 		// Split content into multiple paragraphs on multiple line breaks.
 		content = splitParagraphs(content)
 		// Trim whitespace around paragraphs.
-		content = trimWhitespace(content)
+		content = trimContent(content)
 	}
 	if (content) {
 		postProcessCommentContent(content, {

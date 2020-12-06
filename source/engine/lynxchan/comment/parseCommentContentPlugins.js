@@ -147,6 +147,10 @@ const postLink = {
 		name: 'class',
 		value: 'quoteLink'
 	}],
+	// Link parser plugin uses `commentUrlParser()` function
+	// to detect links to other comments and extract
+	// `commentId`/`threadId`/`boardId` info from such links.
+	getOptions: ({ commentUrlParser }) => ({ commentUrlParser }),
 	createBlock(content, util, { commentUrlParser }) {
 		const postLink = parsePostLink(util.getAttribute('href'), { commentUrlParser })
 		return {
@@ -162,7 +166,7 @@ const postLink = {
 
 const link = {
 	tag: 'a',
-	createBlock(content, util, { commentUrlParser }) {
+	createBlock(content, util) {
 		// "https://google.de/"
 		return createLink(util.getAttribute('href'), content)
 	}
