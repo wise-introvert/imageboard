@@ -1,13 +1,17 @@
 import createByIdIndex from './utility/createByIdIndex'
 
 /**
- * For each post sets `post.replies` to
- * the list of reply ids to this post.
- * Doesn't set it to an array of post objects
- * to prevent JSON circular structure.
- * Sets just post ids instead.
+ * For each `post` having replies, creates a `post.replies[]` property
+ * with the list of replies to this `post`
+ * (either their `ids` or the actual `Post` objects).
+ * The reply info is looked up from `post.inReplyTo[]` property.
+ * The `expandReplies` parameter controls whether the `.replies[]` list
+ * is gonna contain just the replying post ids or the posts themselves.
+ * The default behavior is the `.replies[]` list just containing replying
+ * post ids in order to prevent the `post` object from turning into a
+ * circular JSON structure when it can't be tested via `deepEqual()` in tests.
  * @param {object[]} posts — Parsed posts.
- * @param {boolean} expandReplies — Pass `true` to expand `replies` array from a list of reply `id`s to a list of the reply objects.
+ * @param {boolean} expandReplies — Pass `true` in order for the created `.replies[]` list to contain the replies themselves rather than just their ids.
  */
 export default function setReplies(posts, expandReplies) {
 	// Create "posts by id" index for optimized performance.
