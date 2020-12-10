@@ -25,7 +25,7 @@ export default class Engine {
 							// Sometimes imageboards may go offline while still responding with a web page:
 							// an incorrect 2xx HTTP status code with HTML content like "We're temporarily offline".
 							// Accepting only `application/json` HTTP responses works around that.
-							console.error(`Expected HTTP request to ${url} to return JSON but got:`)
+							console.error(`An HTTP request to ${url} returned an invalid JSON:`)
 							console.error(response)
 							throw new Error('INVALID_RESPONSE')
 						}
