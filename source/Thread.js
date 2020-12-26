@@ -85,7 +85,7 @@ export default function Thread(thread, comments, {
 	// based on the `.inReplyTo` array.
 	// `.replies` array contains comment IDs.
 	// Can only come after `.inReplyTo` arrays are set on comments.
-	setReplies(comments, expandReplies)
+	setReplies(comments, { expandReplies })
 	for (const comment of comments) {
 		if (parseContent === false) {
 			if (shouldAddParseContent) {

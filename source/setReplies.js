@@ -13,13 +13,13 @@ import createByIdIndex from './utility/createByIdIndex'
  * @param {object[]} posts — Parsed posts.
  * @param {boolean} expandReplies — Pass `true` in order for the created `.replies[]` list to contain the replies themselves rather than just their ids.
  */
-export default function setReplies(posts, expandReplies) {
+export default function setReplies(posts, { expandReplies }) {
 	// Create "posts by id" index for optimized performance.
 	const getPostById = createByIdIndex(posts)
 	for (const post of posts) {
 		if (post.inReplyTo) {
 			for (let inReplyToPost of post.inReplyTo) {
-				// `inReplyTo` is an array of posts if `expandAttachments` is `true`.
+				// `inReplyTo` is an array of posts if `expandReplies` is `true`.
 				if (!expandReplies) {
 					// Using `postsById` index is much faster than array lookup.
 					// const inReplyToPost = posts.find(_ => _.id === postId)
