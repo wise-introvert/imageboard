@@ -1,5 +1,6 @@
 {
 	"id": "8ch",
+	"aliases": ["8kun"],
 	"domain": "8kun.top",
 	"engine": "OpenIB",
 	"defaultAuthorName": {

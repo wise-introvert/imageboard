@@ -1,7 +1,7 @@
 import expectToEqual from '../../../utility/expectToEqual'
 
 import KohlChan from '../../../chan/kohlchan'
-import KohlChanConfig from '../../../chan/kohlchan/index.json'
+import KohlChanConfig from '../../../../chans/kohlchan/index.json'
 
 import { fixNewLineCharacters } from './parseComment'
 

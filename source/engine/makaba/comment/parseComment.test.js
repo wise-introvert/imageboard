@@ -1,7 +1,7 @@
 import expectToEqual from '../../../utility/expectToEqual'
 
 import TwoChan from '../../../chan/2ch'
-import TwoChanConfig from '../../../chan/2ch/index.json'
+import TwoChanConfig from '../../../../chans/2ch/index.json'
 
 function parseCommentTest(comment, options, expected, expectedWarnings = []) {
 	const consoleWarn = console.warn

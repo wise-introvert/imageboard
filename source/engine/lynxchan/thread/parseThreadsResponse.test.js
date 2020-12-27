@@ -1,7 +1,7 @@
 import expectToEqual from '../../../utility/expectToEqual'
 
 import Chan from '../../../Chan'
-import KohlChanConfig from '../../../chan/kohlchan/index.json'
+import KohlChanConfig from '../../../../chans/kohlchan/index.json'
 
 import API_RESPONSE from './parseThreadsResponse.test.input.1'
 import THREADS from './parseThreadsResponse.test.output.1'

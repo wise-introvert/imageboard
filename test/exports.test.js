@@ -12,6 +12,7 @@ describe('exports', () => {
 	it('should export ES6', () => {
 		Chan.should.be.a('function')
 		getConfig.should.be.a('function')
+		getConfig('4chan').id.should.equal('4chan')
 		getCommentText.should.be.a('function')
 		// generateQuotes.should.be.a('function')
 		// generatePreview.should.be.a('function')
@@ -24,6 +25,7 @@ describe('exports', () => {
 		Library.should.be.a('function')
 		Library.default.should.be.a('function')
 		Library.getConfig.should.be.a('function')
+		Library.getConfig('4chan').id.should.equal('4chan')
 		Library.getCommentText.should.be.a('function')
 		// Library.generateQuotes.should.be.a('function')
 		// Library.generatePreview.should.be.a('function')

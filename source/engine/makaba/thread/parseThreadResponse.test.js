@@ -1,7 +1,7 @@
 import expectToEqual from '../../../utility/expectToEqual'
 
 import Chan from '../../../Chan'
-import TwoChanConfig from '../../../chan/2ch/index.json'
+import TwoChanConfig from '../../../../chans/2ch/index.json'
 
 describe('2ch.hk', () => {
 	it('should parse comments', () => {
