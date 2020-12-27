@@ -29,7 +29,7 @@ export function generatePostLinksAndUpdatePreview(comment, {
 	generatedQuoteNewLineCharacterLength,
 	commentLengthLimit,
 	hasBeenCalledBefore,
-	isParentCommentUpdate
+	_isTriggeredByParentCommentContentChange
 }) {
 	const content = comment.content
 	let contentDidChange
@@ -49,7 +49,7 @@ export function generatePostLinksAndUpdatePreview(comment, {
 			}
 		}
 	}
-	if (!hasBeenCalledBefore || isParentCommentUpdate) {
+	if (!hasBeenCalledBefore || _isTriggeredByParentCommentContentChange) {
 		// Autogenerate "in reply to" quotes.
 		if (setPostLinkQuotes(content, {
 			getCommentById,
@@ -88,7 +88,7 @@ export function generatePostLinksAndUpdatePreview(comment, {
 export function addParseContent(comment, {
 	boardId,
 	threadId,
-	getCommentById,
+	getCommentById: originalGetCommentById,
 	messages,
 	generatedQuoteMaxLength,
 	generatedQuoteMinFitFactor,
@@ -99,7 +99,12 @@ export function addParseContent(comment, {
 	parseCommentContent
 }) {
 	let hasBeenCalled
-	addOnContentChange(comment, (isParentCommentUpdate) => {
+	// Custom `getCommentById` can be passed.
+	// For example, in cases when an application performs a periodical
+	// "auto refresh" of a thread: if a comment gets removed by a moderator,
+	// then custom `getCommentById()` function would still find such comment
+	// because it would still be accessible from the original thread data.
+	addOnContentChange(comment, ({ _isTriggeredByParentCommentContentChange, getCommentById }) => {
 		const hasBeenCalledBefore = hasBeenCalled
 		hasBeenCalled = true
 		// Set "External comment" for links to other threads.
@@ -107,7 +112,7 @@ export function addParseContent(comment, {
 		// Set "Hidden comment" for links to hidden comments.
 		// Autogenerate "in reply to" quotes for links to all other comments.
 		return generatePostLinksAndUpdatePreview(comment, {
-			getCommentById,
+			getCommentById: getCommentById || originalGetCommentById,
 			threadId,
 			messages,
 			generatedQuoteMaxLength,
@@ -116,7 +121,7 @@ export function addParseContent(comment, {
 			generatedQuoteNewLineCharacterLength,
 			commentLengthLimit,
 			hasBeenCalledBefore,
-			isParentCommentUpdate
+			_isTriggeredByParentCommentContentChange
 		})
 	}, {
 		expandReplies
@@ -125,7 +130,7 @@ export function addParseContent(comment, {
 	// `social-components/source/utility/post/loadResourceLinks.js`,
 	// so `shouldUpdateReplies` is assumed to be `true` by default.
 	let shouldUpdateRepliesOnNextParse
-	comment.parseContent = (options = {}) => {
+	comment.parseContent = ({ _exhaustive, getCommentById } = {}) => {
 		// Suppose there's a descendant comment whose `.parseContent()`
 		// was called. That `.parseContent()` would then call `.parseContent()`
 		// of all comments it quotes (and then the process repeats, if required).
@@ -159,14 +164,14 @@ export function addParseContent(comment, {
 			// but only if the cited comment doesn't have anything
 			// except for `post-link`s.
 			let shouldBeReParsedLater
-			if (comment.inReplyTo) {
+			if (comment.inReplyTo && expandReplies) {
 				let _canGeneratePostQuoteIgnoringNestedPostQuotes
-				if (options.exhaustive === false) {
+				if (_exhaustive === false) {
 					// Backup the non-parsed comment content, so that it could be
 					// stored as a `comment.rawContent` property for the future
 					// in case the
 					const rawContent = comment.content
-					parseContent(comment)
+					parseContent()
 					// At this stage, it won't autogenerate quotes for "block" `post-link`s
 					// not having human-written `content`. Instead, for such `post-link`s,
 					// it will just flag them with `_block: true`.
@@ -179,7 +184,7 @@ export function addParseContent(comment, {
 					// For example, there's comment A, that quotes comment B,
 					// that, in turn, quotes comment C.
 					// In such case, when showing comments starting from C,
-					// B.parseContent({ exhaustive: false }) is called,
+					// B.parseContent({ _exhaustive: false }) is called,
 					// which marks B's `post-link` to A with `_block: true`,
 					// so that `canGeneratePostQuoteIgnoringNestedPostQuotes(B)`
 					// could determine if it could skip the "block" `post-link` to A
@@ -189,7 +194,7 @@ export function addParseContent(comment, {
 					setPostLinkQuotes(
 						comment.content,
 						{
-							getCommentById,
+							getCommentById: getCommentById || originalGetCommentById,
 							messages,
 							// These three options aren't used anyway,
 							// but they're passed just for code consistency.
@@ -224,12 +229,19 @@ export function addParseContent(comment, {
 						generatedQuoteNewLineCharacterLength
 					}))) {
 						_canGeneratePostQuoteIgnoringNestedPostQuotes = true
-						// Don't parse `inReplyTo` comments for this "non-exhaustive" parse.
-						// But since the comment isn't fully "parsed" in a sense that
+						// Don't call `.parseContent()` for the comments in the
+						// `inReplyTo` comments list for this "non-exhaustive" parse.
+						// But since this comment isn't fully "parsed" in a sense that
 						// its autogenerated post link quotes haven't been set yet,
-						// then mark this comments for later re-parsing.
+						// mark this comment for later "exhaustive" re-parsing.
 						shouldBeReParsedLater = true
+						// A later "exhaustive" re-parsing of this comment's content
+						// won't change the autogenerated quotes in any of the replies,
+						// so those replies' `.content` shouldn't be updated when an
+						// "exhaustive" `.parseContent()` is performed on this comment later.
 						shouldUpdateRepliesOnNextParse = false
+						// Store the original (non-parsed) content,
+						// so that it could be re-parsed properly later.
 						comment.rawContent = rawContent
 					} else {
 						// Undo parsing `comment.content`:
@@ -241,10 +253,10 @@ export function addParseContent(comment, {
 					// Parse `inReplyTo` comments.
 					// Those comments could be half-parsed for now to reduce
 					// the overall parsing time for this comment,
-					// hence the `exhaustive: false` flag.
+					// hence the `_exhaustive: false` flag.
 					for (const comment of comment.inReplyTo) {
 						if (!comment.hasContentBeenParsed) {
-							comment.parseContent({ exhaustive: false })
+							comment.parseContent({ _exhaustive: false })
 						}
 					}
 					parseContent()
@@ -281,7 +293,7 @@ export function addParseContent(comment, {
 				setPostLinkQuotes(
 					comment.content,
 					{
-						getCommentById,
+						getCommentById: getCommentById || originalGetCommentById,
 						messages,
 						generatedQuoteMaxLength,
 						generatedQuoteMinFitFactor,
@@ -295,7 +307,8 @@ export function addParseContent(comment, {
 				comment.hasContentBeenParsed = true
 				// Update autogenerated quotes in child comments.
 				comment.onContentChange({
-					shouldUpdateReplies: shouldUpdateRepliesOnNextParse
+					shouldUpdateReplies: shouldUpdateRepliesOnNextParse,
+					getCommentById
 				})
 				// `.parseContent()` method is set to a "no op" function
 				// instead of `undefined` for convenience.
@@ -330,17 +343,25 @@ export function addParseContent(comment, {
  * @return {number[]} [description] Returns an array of ids of replies to this comment whose content did change as a result of this comment content's change.
  */
 function addOnContentChange(comment, updateAutogeneratedContent, { expandReplies }) {
-	// `isParentCommentUpdate` is only passed internally when calling
-	// `.onContentChange()` for child comments recursively.
-	// `isParentCommentUpdate` should not be passed when calling
-	// `.onContentChange()` as a public API.
+	// `_isTriggeredByParentCommentContentChange` is only passed
+	// internally when calling `.onContentChange()` for replies recursively.
+	// `_isTriggeredByParentCommentContentChange` should not be passed
+	// when calling `.onContentChange()` as a public API.
 	// Returns the list of child comment ids whose `content`
 	// did change as a result of the parent comment content change.
-	comment.onContentChange = (options = {}) => {
-		const { isParentCommentUpdate, shouldUpdateReplies } = options
+	comment.onContentChange = ({
+		_isTriggeredByParentCommentContentChange,
+		shouldUpdateReplies,
+		getCommentById
+	} = {}) => {
 		const autogeneratedContentDidChange = comment.content &&
-			updateAutogeneratedContent(isParentCommentUpdate)
-		if (isParentCommentUpdate) {
+			updateAutogeneratedContent({
+				_isTriggeredByParentCommentContentChange,
+				// If custom `getCommentById()` option is passed,
+				// it replaces the default one used in `updateAutogeneratedContent()`.
+				getCommentById
+			})
+		if (_isTriggeredByParentCommentContentChange) {
 			if (autogeneratedContentDidChange) {
 				// Theoretically there can be cases when a post's content
 				// is present is quotes on a deeper nesting level.
@@ -354,21 +375,40 @@ function addOnContentChange(comment, updateAutogeneratedContent, { expandReplies
 				return []
 			}
 		}
-		// Don't recurse into updating replies for potentially less CPU usage.
-		// Sometimes replies depend on parent's parent reply content.
-		// For example, if comment #1 is "Text" and comment #2 is ">>1"
-		// and comment #3 is ">>2" then when comment #1 `content` is paresed
-		// then only comment #2 `content` is updated to "> Text" and
-		// comment #3 `content` is not updated in this case and will
-		// just be a "Message" link. The solution is: don't post comments
-		// without the actual content.
-		// `shouldUpdateReplies` is `undefined` when called from
-		// `social-components/source/utility/post/loadResourceLinks.js`,
-		// so `shouldUpdateReplies` is assumed to be `true` by default.
+		// The `if` block above is added to capture "recursive" calls
+		// to `.onContentChange()` function so that it doesn't recurse
+		// into replies of replies for potentially less CPU usage.
+		// There're, however, hypothetical edge cases, when replies'
+		// content does depend on the content of their parent's parent.
+		// And in those hypothetical edge cases it won't autogenerate
+		// quotes correctly. For example, if comment #1 content is
+		// "Original comment", and comment #2 content is ">>1",
+		// and comment #3 content is ">>2", then, when `.parseContent()`
+		// is called on comment #1, comment #2 `content` gets updated
+		// to "> Original comment", but since it  doesn't recurse into
+		// replies' replies, comment #3 `content` won't be updated to
+		// something like "> > Original comment", and will just stay ">>1".
+		// The solution is: don't allow posting comments without the actual content.
+		//
+		// The default behavior is to update all replies unless
+		// `shouldUpdateReplies: false` option is passed.
+		// For example, `social-components` library's `loadResourceLinks()`
+		// function calls `.onContentChange()`, so it's kind of a public API.
+		// So, `shouldUpdateReplies` option being `undefined` is assumed to be `true`.
+		//
 		else if (shouldUpdateReplies !== false) {
 			if (comment.replies && expandReplies) {
 				return comment.replies
-					.map(reply => reply.hasContentBeenParsed && reply.content && reply.onContentChange({ isParentCommentUpdate: true }) ? reply.id : undefined)
+					.map((reply) => {
+						if (reply.hasContentBeenParsed
+							&& reply.content
+							&& reply.onContentChange({
+								_isTriggeredByParentCommentContentChange: true,
+								getCommentById
+							})) {
+							return reply.id
+						}
+					})
 					.filter(_ => _)
 			}
 			return []
