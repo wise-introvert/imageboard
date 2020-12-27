@@ -68,16 +68,23 @@ export default function Thread(thread, comments, {
 			// To prevent such cyclic links this expclicit "not a link to self"
 			// filter is applied, even though such things can't normally happen.
 			inReplyTo = inReplyTo.filter(commentId => commentId !== comment.id)
-			if (expandReplies) {
-				inReplyTo = inReplyTo.map(getCommentById)
-					// Comments can be deleted by moderators.
-					.filter(_ => _)
-			} else {
-				// Comments can be deleted by moderators.
-				inReplyTo = inReplyTo.filter(getCommentById)
+			// Some comments may have been removed by moderators.
+			// Classify "in reply to" comments into existing and removed ones.
+			const inReplyToComments = []
+			const inReplyToRemovedCommentIds = []
+			for (const commentId of inReplyTo) {
+				const comment = getCommentById(commentId)
+				if (comment) {
+					inReplyToComments.push(comment)
+				} else {
+					inReplyToRemovedCommentIds.push(commentId)
+				}
 			}
-			if (inReplyTo.length > 0) {
-				comment.inReplyTo = inReplyTo
+			if (inReplyToComments.length > 0) {
+				comment.inReplyTo = expandReplies ? inReplyToComments : inReplyToComments.map(_ => _.id)
+			}
+			if (inReplyToRemovedCommentIds.length > 0) {
+				comment.inReplyToRemoved = inReplyToRemovedCommentIds
 			}
 		}
 	}

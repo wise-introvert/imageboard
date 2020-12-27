@@ -615,6 +615,9 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // If `expandReplies: true` option was passed
   // then `inReplyTo` is a list of `Comment`s.
   inReplyTo: (number[]|Comment[])?,
+  // If the comment replies to some comments that have been deleted,
+  // then this is gonna be the list of IDs of such deleted comments.
+  inReplyToRemoved: number[]?,
   // The IDs of the comments which are replies to this comment.
   // (excluding deleted comments).
   // If `expandReplies: true` option was passed
