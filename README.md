@@ -720,7 +720,15 @@ Additional fields:
   },
 
   // (required)
-  // A template for parsing links to other comments in comment HTML.
+  // A template for a thread URL.
+  // Isn't used anywhere in this library,
+  // but third party applications like `captchan`
+  // might use it to generate a link to the "original" thread.
+  "threadUrl": "/{boardId}/res/{threadId}.html",
+
+  // (required)
+  // A template for a comment URL.
+  // Is used when parsing links to other comments in comment HTML.
   "commentUrl": "/{boardId}/res/{threadId}.html#{commentId}",
 
   // (optional)
