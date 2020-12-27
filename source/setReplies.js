@@ -24,11 +24,15 @@ export default function setReplies(posts, { expandReplies }) {
 					// Using `postsById` index is much faster than array lookup.
 					// const inReplyToPost = posts.find(_ => _.id === postId)
 					inReplyToPost = getPostById(inReplyToPost)
+					// If the quoted post has been deleted by a moderator,
+					// then it has also been removed from `.inReplyTo[]` in
+					// `source/Thread.js`, so, at this point, `inReplyToPost`
+					// does exist.
 				}
 				inReplyToPost.replies = inReplyToPost.replies || []
 				// Doesn't set it to an array of post objects
 				// to prevent JSON circular structure.
-				// Sets just post ids instead.
+				// Sets just post IDs instead.
 				inReplyToPost.replies.push(expandReplies ? post : post.id)
 			}
 		}

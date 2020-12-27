@@ -51,6 +51,7 @@ function getInReplyToPostIdsForParsedContent(content, {
 	visitPostParts(
 		'post-link',
 		link => {
+			// Only add same-thread comment IDs as "quoted" ones.
 			if (link.boardId === boardId && link.threadId === threadId) {
 				if (!inReplyTo) {
 					inReplyTo = []
