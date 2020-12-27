@@ -120,6 +120,24 @@ export default class Engine {
 	}
 
 	/**
+	 * A "feature-detection" method.
+	 * @return {boolean} Returns `true` if an imageboard engine supports `.findBoards()` method.
+	 */
+	canSearchForBoards() {
+		return false
+	}
+
+	/**
+	 * Searches for boards matching a query.
+	 * @param  {string} query
+	 * @return {Board[]}
+	 */
+	async findBoards(query) {
+		// This method isn't currently implemented in any of the supported imageboard engines.
+		throw new Error('Not implemented')
+	}
+
+	/**
 	 * Returns `true` if an imageboard has a "get all boards" API endpoint
 	 * that's different from the regular "get boards" API endpoint.
 	 * In other words, returns `true` if an imageboard provides separate API

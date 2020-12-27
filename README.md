@@ -265,13 +265,23 @@ Available `options`:
 
 Returns a list of [Boards](#board). For some imageboards this isn't gonna be a full list of boards because, for example, `8ch.net (8kun.top)` has about `20,000` boards so `getBoards()` returns just the "top 20 boards" list.
 
-### `getAllBoards(): Board[]`
-
-Returns a list of all [Boards](#board). For example, `8ch.net (8kun.top)` has about `20,000` boards so `getBoards()` returns just the "top 20 boards" list while `getAllBoards()` returns all `20,000` boards.
-
 ### `hasMoreBoards(): boolean`
 
-Returns `true` if an imageboard has a "get all boards" API endpoint that's different from the regular "get boards" API endpoint. In other words, returns `true` if an imageboard provides separate API endpoints for getting a list of "most popular boards" and a list of "all boards available".
+Returns `true` if the "get boards" API doesn't return the full list of boards. For example, `8ch.net (8kun.top)` has about `20,000` boards, so `getBoards()` returns just the "top 20 boards", and to indicate that, `hasMoreBoards()` returns `true`.
+
+### `getAllBoards(): Board[]`
+
+Returns the list of all [Boards](#board). For example, `8ch.net (8kun.top)` has about `20,000` boards, so `getBoards()` returns just the "top 20 boards", while `getAllBoards()` returns all `20,000` boards.
+
+### `findBoards(query: string): Board[]`
+
+Returns a (non-full) list of [Boards](#board) matching a `query`. For example, if an imageboard supports creating "user boards", and there're a lot of them, then `getBoards()` should return just the most popular ones, and to discover all other boards, searching by a query should be used.
+
+This method isn't currently implemented in any of the supported imageboard engines.
+
+### `canSearchForBoards(): boolean`
+
+Returns `true` if the imageboard supports searching for boards by a query.
 
 ### `getThreads({ boardId: string }, options: object?): Thread[]`
 
@@ -704,11 +714,11 @@ Additional fields:
     "getBoards": "/boards-top20.json",
 
     // (optional)
-    // "Get all boards list" API URL.
-    // `8ch.net (8kun.top)` has about `20,000` boards total
-    // so "getBoards" API only returns top 20 of them
-    // while "getAllBoards" API returns all `20,000` of them.
-    "getAllBoards": "/boards.json",
+    // "Find boards by a query" API URL.
+    // `8ch.net (8kun.top)` has about `20,000` boards total,
+    // so "getBoards()" API only returns top 20 of them,
+    // while "findBoards('')" API returns all `20,000` of them.
+    "findBoards": "/boards.json",
 
     // (required)
     // "Get threads list" API URL template.
