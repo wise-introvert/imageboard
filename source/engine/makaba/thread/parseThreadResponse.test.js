@@ -353,6 +353,9 @@ describe('2ch.hk', () => {
 					]
 				],
 				"createdAt": new Date("2019-01-16T09:20:06.000Z"),
+				"inReplyToRemoved": [
+					28942338
+				],
 				"replies": [
 					28943045
 				]
@@ -380,6 +383,9 @@ describe('2ch.hk', () => {
 					]
 				],
 				"createdAt": new Date("2019-01-16T09:20:51.000Z"),
+				"inReplyToRemoved": [
+					28942773
+				],
 				"replies": [
 					28943045
 				]
@@ -441,6 +447,9 @@ describe('2ch.hk', () => {
 				"inReplyTo": [
 					28942787,
 					28942793
+				],
+				"inReplyToRemoved": [
+					28942908
 				],
 				"createdAt": new Date("2019-01-16T09:47:03.000Z")
 			}

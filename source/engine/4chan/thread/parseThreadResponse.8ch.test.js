@@ -151,6 +151,9 @@ const RESULT = {
       ],
       "authorId": "1e453c",
       "authorIdColor": "#252d45",
+      "inReplyToRemoved": [
+        6536
+      ],
       "replies": [
         6539
       ]
