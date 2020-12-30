@@ -181,8 +181,7 @@ export function addParseContent(comment, {
 				let _canGeneratePostQuoteIgnoringNestedPostQuotes
 				if (_exhaustive === false) {
 					// Backup the non-parsed comment content, so that it could be
-					// stored as a `comment.rawContent` property for the future
-					// in case the
+					// stored as a `comment.rawContent` property for future re-parsing.
 					const rawContent = comment.content
 					parseContent()
 					// At this stage, it won't autogenerate quotes for "block" `post-link`s
