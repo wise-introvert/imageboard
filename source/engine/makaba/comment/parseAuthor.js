@@ -2,8 +2,6 @@ const RANDOM_NON_COLORED_NAME_REGEXP = /^Аноним&nbsp;ID:&nbsp;([^<]+)$/
 const AUTHOR_ID_REGEXP = /^Аноним&nbsp;ID:&nbsp;<span id="id_tag_([a-f0-9]+)" style="color:rgb\((\d+),(\d+),(\d+)\);">([^<]+)<\/span>$/
 
 export default function parseAuthor(name, { defaultAuthorName, boardId }) {
-	// `makaba` engine allows whitespace author name.
-	name = name.trim()
 	if (!name) {
 		return
 	}

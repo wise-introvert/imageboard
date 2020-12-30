@@ -28,7 +28,8 @@ export default function parseComment(post, {
 	badges
 }) {
 	// `post.comment` is always present, even when there's no text.
-	let content = post.comment
+	// Whitespace-only `post.comment` is not trimmed by the engine.
+	let content = post.comment.trim()
 	// Remove "Абу благословил этот пост" footer.
 	let abuLike = false
 	if (ABU_LIKE.test(content)) {
@@ -38,7 +39,9 @@ export default function parseComment(post, {
 	const id = parseInt(post.num)
 	const threadId = parseInt(post.parent)
 	const isOpeningPost = threadId === 0
-	const author = parseAuthor(post.name, { defaultAuthorName, boardId })
+	// `post.name` is always present, even when there's no user name.
+	// Whitespace-only `post.name` is not trimmed by the engine.
+	const author = parseAuthor(post.name.trim(), { defaultAuthorName, boardId })
 	const comment = {
 		boardId,
 		threadId: isOpeningPost ? id : threadId,
