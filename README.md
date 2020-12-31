@@ -376,6 +376,9 @@ Can be used, for example, in cases when a thread has no title (and so thread tit
 Available `options` (optional argument):
 
 * `messages: Messages?` — (optional) "Messages" ("strings", "labels") used when generating comment `content` text. See [Messages](#messages).
+* `maxLength: number` — (optional) See `maxLength` argument of `trimText()` in `social-components`.
+* `minFitFactor: number` — (optional) See `minFitFactor` option of `trimText()` in `social-components`.
+* `maxFitFactor: number` — (optional) See `maxFitFactor` option of `trimText()` in `social-components`.
 * `parseContent: boolean?` — (optional) If `parseContent: false` is used to skip parsing comments' `content` when using `imageboard` methods then `parseContent: false` option should also be passed here so indicate that the "opening" comment `content` (raw unparsed HTML markup) should be ignored.
 -->
 

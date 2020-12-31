@@ -116,7 +116,9 @@ export default function Thread(thread, comments, {
 					comment.parseContent = () => {
 						parseContent()
 						generateThreadTitle(thread, {
-							messages
+							messages,
+							minFitFactor: generatedQuoteMinFitFactor,
+							maxFitFactor: generatedQuoteMaxFitFactor
 						})
 					}
 				}
@@ -152,6 +154,8 @@ export default function Thread(thread, comments, {
 	// autogenerate it from the first comment's `content`.
 	generateThreadTitle(thread, {
 		messages,
+		minFitFactor: generatedQuoteMinFitFactor,
+		maxFitFactor: generatedQuoteMaxFitFactor,
 		parseContent
 	})
 	return thread
