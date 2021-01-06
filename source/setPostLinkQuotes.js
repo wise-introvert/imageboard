@@ -183,7 +183,6 @@ export default function setPostLinkQuotes(
 		const generateBlockQuotes = shouldGenerateQuotes === false || shouldGenerateBlockQuotes === false ? false : true
 		if (generateBlockQuotes) {
 			let attachment
-			// See the comments on `generateBlockQuotes: false` in `parseContent.js`.
 			const text = generatePostQuote(quotedPost, {
 				...getGeneratePostQuoteOptions(options),
 				onUntitledAttachment: _ => attachment = _
@@ -200,8 +199,7 @@ export default function setPostLinkQuotes(
 				// then also set the attachment itself, so that it could be
 				// displayed instead of a generic "Picture"/"Video" placeholder.
 				if (attachment) {
-					postLink.attachment = attachment
-					postLink.attachmentsCount = quotedPost.attachments.length
+					postLink.attachments = quotedPost.attachments
 				}
 				// Content did change.
 				return true
