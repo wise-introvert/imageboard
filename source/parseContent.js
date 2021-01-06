@@ -144,6 +144,15 @@ export function addParseContent(comment, {
 	// because it would still be accessible from the original thread data.
 	//
 	comment.parseContent = ({ _exhaustive, getCommentById } = {}) => {
+		// The `comment` object reference might have changed for some reason
+		// (for example, in `captchan` during thread auto-update).
+		// If a developer passes `getCommentById()`, then there's a reason for it,
+		// and the reason is most likely that comment object references do change.
+		// Therefore, it makes sense to also update the current `comment` object
+		// reference when this function is called.
+		if (getCommentById) {
+			comment = getCommentById(comment.id)
+		}
 		// Suppose there's a descendant comment whose `.parseContent()`
 		// was called. That `.parseContent()` would then call `.parseContent()`
 		// of all comments it quotes (and then the process repeats, if required).
