@@ -27,5 +27,5 @@ export default function postProcessCommentContent(content, {
 	// Expand attachment links (objects of shape `{ type: 'link', attachment: ... }`)
 	// into standalone attachments (block-level attachments: `{ type: 'attachment' }`).
 	// In such case attachments are moved from `{ type: 'link' }` objects to `post.attachments`.
-	expandStandaloneAttachmentLinks(comment)
+	expandStandaloneAttachmentLinks(comment.content)
 }
