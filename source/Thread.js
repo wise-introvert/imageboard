@@ -93,6 +93,12 @@ export default function Thread(thread, comments, {
 	// `.replies` array contains comment IDs.
 	// Can only come after `.inReplyTo` arrays are set on comments.
 	setReplies(comments, { expandReplies })
+	// If `thread.title` is missing then copy it from
+	// the first comment's `title`.
+	if (!thread.title) {
+		thread.title = comments[0].title
+	}
+	// Add `.parseContent()` function to each `comment` (if required).
 	for (const comment of comments) {
 		if (parseContent === false) {
 			if (shouldAddParseContent) {
@@ -116,20 +122,23 @@ export default function Thread(thread, comments, {
 						commentLengthLimit,
 						expandReplies
 					})
-					// Also call `generateThreadTitle()` after
-					// the "opening" comment's `.parseContent()`.
+				}(comment))
+				// If `thread.title` is missing then attempt to autogenerate
+				// thread title from the first comment's `content`.
+				// (after the first comment's `content` has been parsed)
+				if (!thread.title) {
 					if (comment.id === thread.id) {
 						const parseContent = comment.parseContent
 						comment.parseContent = (options) => {
 							parseContent(options)
 							generateThreadTitle(thread, {
-								messages,
 								minFitFactor: generatedQuoteMinFitFactor,
-								maxFitFactor: generatedQuoteMaxFitFactor
+								maxFitFactor: generatedQuoteMaxFitFactor,
+								messages
 							})
 						}
 					}
-				}(comment))
+				}
 			}
 		}
 		// If the comment has any content and `parseContent` is not `false`
@@ -157,16 +166,16 @@ export default function Thread(thread, comments, {
 		thread.createdAt = comments[0].createdAt
 	}
 	thread.comments = comments
-	// If `thread.title` is missing then either copy it
-	// from the first comment's `title` or attempt to
-	// autogenerate it from the first comment's `content`.
+	// If `thread.title` is missing then attempt to autogenerate
+	// thread title from the first comment's `content`.
 	if (!thread.title) {
-		generateThreadTitle(thread, {
-			messages,
-			minFitFactor: generatedQuoteMinFitFactor,
-			maxFitFactor: generatedQuoteMaxFitFactor,
-			parseContent
-		})
+		if (parseContent !== false) {
+			generateThreadTitle(thread, {
+				minFitFactor: generatedQuoteMinFitFactor,
+				maxFitFactor: generatedQuoteMaxFitFactor,
+				messages
+			})
+		}
 	}
 	return thread
 }
