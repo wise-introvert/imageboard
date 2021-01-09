@@ -96,32 +96,40 @@ export default function Thread(thread, comments, {
 	for (const comment of comments) {
 		if (parseContent === false) {
 			if (shouldAddParseContent) {
-				addParseContent(comment, {
-					boardId,
-					threadId: thread.id,
-					parseCommentContent,
-					getCommentById,
-					messages,
-					generatedQuoteMaxLength,
-					generatedQuoteMinFitFactor,
-					generatedQuoteMaxFitFactor,
-					generatedQuoteNewLineCharacterLength,
-					commentLengthLimit,
-					expandReplies
-				})
-				// Also call `generateThreadTitle()` after
-				// the "opening" comment's `.parseContent()`.
-				if (comment.id === thread.id) {
-					const parseContent = comment.parseContent
-					comment.parseContent = () => {
-						parseContent()
-						generateThreadTitle(thread, {
-							messages,
-							minFitFactor: generatedQuoteMinFitFactor,
-							maxFitFactor: generatedQuoteMaxFitFactor
-						})
+				// Create a "closure" here, otherwise it would reuse the
+				// `comment` variable, and, for every comment, the `comment`
+				// variable "captured" in `.parseContent()` functions
+				// would end up referencing the last comment in this
+				// `for ... of` loop. Weird javascript.
+				// https://www.w3schools.com/js/js_function_closures.asp
+				(function(comment) {
+					addParseContent(comment, {
+						boardId,
+						threadId: thread.id,
+						parseCommentContent,
+						getCommentById,
+						messages,
+						generatedQuoteMaxLength,
+						generatedQuoteMinFitFactor,
+						generatedQuoteMaxFitFactor,
+						generatedQuoteNewLineCharacterLength,
+						commentLengthLimit,
+						expandReplies
+					})
+					// Also call `generateThreadTitle()` after
+					// the "opening" comment's `.parseContent()`.
+					if (comment.id === thread.id) {
+						const parseContent = comment.parseContent
+						comment.parseContent = (options) => {
+							parseContent(options)
+							generateThreadTitle(thread, {
+								messages,
+								minFitFactor: generatedQuoteMinFitFactor,
+								maxFitFactor: generatedQuoteMaxFitFactor
+							})
+						}
 					}
-				}
+				}(comment))
 			}
 		}
 		// If the comment has any content and `parseContent` is not `false`
@@ -152,11 +160,13 @@ export default function Thread(thread, comments, {
 	// If `thread.title` is missing then either copy it
 	// from the first comment's `title` or attempt to
 	// autogenerate it from the first comment's `content`.
-	generateThreadTitle(thread, {
-		messages,
-		minFitFactor: generatedQuoteMinFitFactor,
-		maxFitFactor: generatedQuoteMaxFitFactor,
-		parseContent
-	})
+	if (!thread.title) {
+		generateThreadTitle(thread, {
+			messages,
+			minFitFactor: generatedQuoteMinFitFactor,
+			maxFitFactor: generatedQuoteMaxFitFactor,
+			parseContent
+		})
+	}
 	return thread
 }
