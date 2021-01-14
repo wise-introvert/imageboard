@@ -158,9 +158,11 @@ Consists of the "opening post" (thread ID is the "opening post" ID) and some thr
 	"closed": 1,
 
 	// (optional)
-	// `1` if the thread is "archived".
-	// When a thread expires due to being pushed off the
+	// `1` if the thread is "archived" (has been moved to board "archive").
+	// On imageboards, threads "expire" due to being pushed off the
 	// last page of a board because there haven't been new replies.
+	// On some boards, such "expired" threads are moved into an "archive"
+	// rather than just being deleted immediately.
 	// Eventually, a thread is deleted from the archive too.
 	// Not all boards have archival feature enabled.
 	// https://github.com/4chan/4chan-API/blob/master/pages/Archive.md

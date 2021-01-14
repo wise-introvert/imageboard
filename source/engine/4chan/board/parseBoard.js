@@ -17,9 +17,9 @@ export default function parseBoard(board) {
 	if (board.ws_board === 0) {
 		parsedBoard.isNotSafeForWork = true
 	}
-	// Presumably "is archived" means that 4chan archives threads on these boards
-	// which means that when threads on those boards go down they're saved in the archive
-	// and can be accessed.
+	// "is archived" flag means that 4chan archives threads on this board:
+	// when threads on such board expire, they're saved in the "archive"
+	// of this board and can still be accessed for some (usually short) time.
 	if (board.is_archived) {
 		parsedBoard.isArchived = true
 	}

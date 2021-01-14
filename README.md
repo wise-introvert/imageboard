@@ -468,6 +468,12 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   isLocked: boolean?,
   // A "rolling" thread is the one where old messages are purged as new ones come in.
   isRolling: boolean?,
+  // On imageboards, threads "expire" due to being pushed off the
+  // last page of a board because there haven't been new replies.
+  // On some boards, such "expired" threads are moved into an "archive"
+  // rather than just being deleted immediately.
+  // Eventually, a thread is deleted from the archive too.
+  isArchived: boolean?,
   // Was the "bump limit" reached for this thread already.
   // Is `false` when the thread is "sticky" or "rolling"
   // because such threads don't expire.
