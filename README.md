@@ -359,7 +359,7 @@ The `options`:
 -->
 
 <!--
-### `generatePreview(comment: Comment, maxCommentLength: number)`
+### `generatePreview(comment: Comment, { maxLength: number, minimizeGeneratedPostLinkBlockQuotes: boolean })`
 
 Generates `contentPreview` for the `comment` if its too long.
 

@@ -28,6 +28,7 @@ export function generatePostLinksAndUpdatePreview(comment, {
 	generatedQuoteMaxFitFactor,
 	generatedQuoteNewLineCharacterLength,
 	commentLengthLimit,
+	minimizeGeneratedPostLinkBlockQuotes,
 	hasBeenCalledBefore,
 	_isTriggeredByParentCommentContentChange
 }) {
@@ -64,7 +65,10 @@ export function generatePostLinksAndUpdatePreview(comment, {
 	}
 	if (!hasBeenCalledBefore || contentDidChange) {
 		if (commentLengthLimit) {
-			generatePreview(comment, commentLengthLimit)
+			generatePreview(comment, {
+				maxLength: commentLengthLimit,
+				minimizeGeneratedPostLinkBlockQuotes
+			})
 		}
 	}
 	return contentDidChange
@@ -94,6 +98,7 @@ export function addParseContent(comment, {
 	generatedQuoteMinFitFactor,
 	generatedQuoteMaxFitFactor,
 	generatedQuoteNewLineCharacterLength,
+	minimizeGeneratedPostLinkBlockQuotes,
 	commentLengthLimit,
 	expandReplies,
 	parseCommentContent
@@ -124,6 +129,7 @@ export function addParseContent(comment, {
 			generatedQuoteMaxFitFactor,
 			generatedQuoteNewLineCharacterLength,
 			commentLengthLimit,
+			minimizeGeneratedPostLinkBlockQuotes,
 			hasBeenCalledBefore,
 			_isTriggeredByParentCommentContentChange
 		})
