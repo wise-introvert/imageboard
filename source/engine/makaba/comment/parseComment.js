@@ -20,6 +20,7 @@ const MAILTO = /^mailto:/
 export default function parseComment(post, {
 	boardId,
 	toAbsoluteUrl,
+	transformAttachmentUrl,
 	tripcode
 }, {
 	defaultAuthorName,
@@ -48,7 +49,7 @@ export default function parseComment(post, {
 		id,
 		content,
 		authorName: author && (typeof author === 'string' ? author : author.name),
-		attachments: parseAttachments(post, { toAbsoluteUrl }),
+		attachments: parseAttachments(post, { transformAttachmentUrl, toAbsoluteUrl }),
 		createdAt: new Date(post.timestamp * 1000)
 	}
 	if (post.subject) {

@@ -10,6 +10,7 @@
 	"commentUrl": "/{boardId}/res/{threadId}.html#{commentId}",
 	"api": {
 		"getThread": "/{boardId}/res/{threadId}.json",
+		"getArchivedThread": "/{boardId}/arch/res/{threadId}.json",
 		"getThreads": "/{boardId}/catalog.json",
 		"getBoards": "/boards.json",
 		"vote": {

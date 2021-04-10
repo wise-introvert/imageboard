@@ -70,7 +70,10 @@ var fourChan = imageboard('4chan', {
       if (response.ok) {
         return response.text()
       }
-      throw new Error(response.status)
+      var error = new Error(response.statusText)
+      // Set HTTP Response status code on the error.
+      error.status = response.status
+      throw error
     })
   }
 })
@@ -243,7 +246,15 @@ See [Imageboard config](#imageboard-config) for the available imageboard `config
 
 Available `options`:
 
-* `request(method: string, url: string, parameters: object?): Promise` — (required) Sends HTTP requests to imageboard API. Must return a `Promise` resolving to response JSON. Example: `request("GET", "https://8kun.top/boards.json")`.
+* `request(method: string, url: string, parameters: object?): Promise` — (required) Sends HTTP requests to imageboard API. Must return a `Promise` resolving to response text.
+
+Example:
+
+```js
+request("GET", "https://8kun.top/boards.json") === "[{ "uri": "b", ... }, ...]"
+```
+
+The `request()` function can also return a `Promise` resolving to an object of shape `{ response, url }` where `response` is the response text and `url` is the "final" URL (after any redirects): this `url` is used internally when requesting an archived thread from `makaba` engine in order to get its `archivedAt` timestamp that can only be obtained from the URL the engine redirects to.
 
 * `commentUrl: string?` — (optional) A template for the `url` of all `type: "post-link"`s (links to other comments) in parsed comments' `content`. Is `"/{boardId}/{threadId}#{commentId}"` by default.
 
@@ -287,9 +298,17 @@ Returns `true` if the imageboard supports searching for boards by a query.
 
 Returns a list of [Threads](#thread).
 
+The optional `options` argument can be used to override some of the `options` of the `imageboard()` function.
+
 ### `getThread({ boardId: string, threadId: number }, options: object?): Thread`
 
 Returns a [Thread](#thread).
+
+The optional `options` argument can be used to override some of the `options` of the `imageboard()` function.
+
+Other available `options`:
+
+* `isArchived` — (optional) Pass `true` when requesting an archived thread. This flag is not required in any way, but, for `makaba` engine, it reduces the number of HTTP Requests from 2 to 1 because in that case it doesn't have to attempt to read the thread by a non-"archived" URL (which returns `404 Not Found`) before attempting to read it by an "archived" URL.
 
 <!--
 ### `parseCommentContent(comment: Comment, { boardId: string, threadId: number })`
@@ -473,7 +492,15 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // On some boards, such "expired" threads are moved into an "archive"
   // rather than just being deleted immediately.
   // Eventually, a thread is deleted from the archive too.
+  // If a thread is archived, then it's locked too (by definition).
   isArchived: boolean?,
+  // If `isArchived` is `true`, then we assume that `archivedAt` is also present.
+  // So far, only `4chan` and `2ch` seem to have the archive feature.
+  // `4chan` provides both `isArchived` and `archivedAt` data in thread properties.
+  // `2ch` doesn't provide such data, but the code employs some hacks
+  // to find out whether a thread is archived, and, if it is, when has it been archived.
+  // So, in both cases, if `isArchived` is `true`, then `archivedAt` also exists.
+  archivedAt: Date?,
   // Was the "bump limit" reached for this thread already.
   // Is `false` when the thread is "sticky" or "rolling"
   // because such threads don't expire.
@@ -739,6 +766,14 @@ Additional fields:
     // (required)
     // "Get thread comments" API URL template.
     "getThread": "/{boardId}/res/{threadId}.json"
+
+    // (optional)
+    // "Get archived thread comments" API URL template.
+    // Some engines (like `4chan`) use the same URLs
+    // for both ongoing and archived threads.
+    // Some engines (like `makaba`) use different URLs
+    // for ongoing and archived threads.
+    "getArchivedThread": "/{boardId}/arch/res/{threadId}.json"
   },
 
   // (required)

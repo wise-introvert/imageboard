@@ -1,5 +1,8 @@
 import parseAndFormatCommentContent from './parseAndFormatCommentContent'
 
+import convertDateToUtc0 from './utility/convertDateToUtc0'
+import joinPath from './utility/joinPath'
+
 export default class Engine {
 	constructor(chanSettings, {
 		useRelativeUrls,
@@ -15,12 +18,26 @@ export default class Engine {
 		if (!useRelativeUrls) {
 			this._baseUrl = `https://${domain}`
 		}
-		this.request = (method, url, options) => {
+		this.request = (method, url, options, { returnResponseInfoObject } = {}) => {
 			return request(method, url, options).then((response) => {
+				// Some engines (like `makaba`) redirect to a different URL
+				// when requesting threads that have been archived.
+				// For example, a request to `https://2ch.hk/b/arch/res/119034529.json`
+				// redirects to `https://2ch.hk/b/arch/2016-03-06/res/119034529.json`.
+				// From that "final" URL, one can get the `archivedAt` date of the thread.
+				// For that reason, the application can (optionally) choose to return
+				// not simply a `string` from the `request()`'s `Promise`, but instead
+				// an `object` having `response: string` and `url: string`.
+				// For example, `captchan` uses this undocumented feature
+				// in order to get `archivedAt` timestamps on `2ch.hk`.
+				if (typeof response === 'object') {
+					url = response.url
+					response = response.response
+				}
 				switch (options.headers['Accept']) {
 					case 'application/json':
 						try {
-							return JSON.parse(response)
+							response = JSON.parse(response)
 						} catch (error) {
 							// Sometimes imageboards may go offline while still responding with a web page:
 							// an incorrect 2xx HTTP status code with HTML content like "We're temporarily offline".
@@ -29,9 +46,15 @@ export default class Engine {
 							console.error(response)
 							throw new Error('INVALID_RESPONSE')
 						}
-					default:
-						return response
+						break
 				}
+				if (returnResponseInfoObject) {
+					return {
+						response,
+						url
+					}
+				}
+				return response
 			})
 		}
 		this.options = {
@@ -179,20 +202,93 @@ export default class Engine {
 	 * @return {object} — A `Thread` object.
 	 */
 	async getThread(parameters, options) {
-		// The API endpoint URL.
-		const url = setParameters(this.options.api.getThread, parameters)
-		// Query the API endpoint.
-		const response = await this.request('GET', this.toAbsoluteUrl(url), {
+		const requestOptions = {
 			headers: {
 				'Accept': 'application/json'
 			}
-		})
+		}
+
+		let response
+
+		// `makaba` requires some hacky workarounds in order to determine
+		// if a thread is archived, and, if it is, when has it been archived.
+		let isArchived
+		let archivedAt
+		let archivedDateString
+
+		const getThread = async () => {
+			const url = setParameters(this.options.api.getThread, parameters)
+			response = await this.request('GET', this.toAbsoluteUrl(url), requestOptions)
+		}
+
+		// Tries to load the thread from the archive.
+		const getThreadFromArchive = async () => {
+			if (this.options.engine === 'makaba' && this.options.api.getArchivedThread) {
+				const url = setParameters(this.options.api.getArchivedThread, parameters)
+				const result = await this.request('GET', this.toAbsoluteUrl(url), requestOptions, {
+					returnResponseInfoObject: true
+				})
+				response = result.response
+				isArchived = true
+				// Extract `archivedAt` date from the "final" URL (after redirect).
+				const archivedDateMatch = result.url.match(/\/arch\/(\d{4}-\d{2}-\d{2})\/res\//)
+				if (archivedDateMatch) {
+					archivedDateString = archivedDateMatch[1]
+					const [year, month, day] = archivedDateString.split('-')
+					archivedAt = convertDateToUtc0(new Date(year, month - 1, day))
+				}
+			}
+		}
+
+		if (options && options.isArchived) {
+			await getThreadFromArchive()
+		} else {
+			try {
+				await getThread()
+			} catch (error) {
+				if (error.status === 404) {
+					// Try to load the thread from the archive.
+					try {
+						await getThreadFromArchive()
+					} catch (error) {
+						console.error(error)
+					}
+				}
+				if (!response) {
+					throw error
+				}
+			}
+		}
+
+		const getMakabaOptions = () => {
+			// For ancient `2ch` (engine: "makaba") threads archived
+			// between `2016-03-06` and `2016-11-12`, transform relative
+			// attachment URLs to absolute ones.
+			// (`file_prefix` is "../" for those)
+			if (isArchived && this.options.engine === 'makaba' && response.file_prefix) {
+				return {
+					transformAttachmentUrl(url) {
+						return joinPath(`/${response.Board}/arch/${archivedDateString}/res`, response.file_prefix, url)
+					}
+				}
+			}
+		}
+
 		// Parse the thread comments list.
 		// `boardId` and `threadId` are still used there.
-		return this.parseThread(response, {
+		const thread = this.parseThread(response, {
 			...parameters,
-			...options
+			...options,
+			...getMakabaOptions()
 		})
+
+		if (isArchived) {
+			thread.isArchived = true
+			thread.isLocked = true
+			thread.archivedAt = archivedAt
+		}
+
+		return thread
 	}
 
 	/**

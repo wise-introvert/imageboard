@@ -3,8 +3,13 @@ import splitFilename from '../../../utility/splitFilename'
 
 const STICKER_FILE_TYPE = 100
 
-export default function parseAttachment(file, { toAbsoluteUrl }) {
-	const formatUrl = toAbsoluteUrl
+export default function parseAttachment(file, { transformAttachmentUrl, toAbsoluteUrl }) {
+	const formatUrl = (url) => {
+		if (transformAttachmentUrl) {
+			url = transformAttachmentUrl(url)
+		}
+		return toAbsoluteUrl(url)
+	}
 	// Stickers don't have a `fullname`.
 	let name
 	if (file.fullname) {

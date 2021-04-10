@@ -10,12 +10,26 @@ var fourChan = imageboard('4chan', {
   request: (method, url, { body, headers }) => {
     return fetch(url, { method, headers, body }).then((response) => {
       if (response.ok) {
-        return response.text()
+        return response.text().then((responseText) => ({
+          url: response.url,
+          response: responseText
+        }))
       }
-      throw new Error(response.status)
+      var error = new Error(response.statusText)
+      // Set HTTP Response status code on the error.
+      error.status = response.status
+      throw error
     })
   }
 })
+
+// // Test `2ch.hk` really old archived thread.
+// return fourChan.getThread({
+//   boardId: 'b',
+//   threadId: 119034529
+// }).then((thread) => {
+//   console.log(JSON.stringify(thread, null, 2))
+// });
 
 // Prints the first 10 boards.
 fourChan.getBoards().then((boards) => {

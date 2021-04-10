@@ -170,6 +170,7 @@ Consists of the "opening post" (thread ID is the "opening post" ID) and some thr
 
 	// (optional)
 	// The date when the thread was "archived" (Unix time).
+	// I assume it's in UTC+0 timezone.
 	"archived_on": 1344571233,
 
 	// (optional)
@@ -418,6 +419,12 @@ and as I already said above line-breaking long text is handled by CSS. Also `4ch
 ```
 
 `4chan.org` uses [MathJAX](https://en.wikipedia.org/wiki/MathJax) library for displaying the equations. MathJAX uses its own "mathematical" font for displaying math.
+
+### Archive
+
+On [some](https://github.com/4chan/4chan-API/blob/master/pages/Boards.md) boards, when a thread is pushed off the last page of the board, it doesn't get immediately erased, and instead becomes "archived" for some time. The [official 4chan docs](https://github.com/4chan/4chan-API/blob/master/pages/Archive.md) don't go into specifics on what the exact time interval is, so I assume the time be 3 days, and the maximum number of currently archived threads be `3000` (the older ones get erased by the newer ones in case of an overflow).
+
+Archived threads are closed to new posts. They have `archived` flag set to `1`.
 
 ### Auto-refresh
 

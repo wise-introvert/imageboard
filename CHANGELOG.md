@@ -1,3 +1,10 @@
+0.4.35 / 08.04.2021
+==================
+
+* Added archived thread support in `makaba` engine.
+
+* (miscellaneous) (advanced) The `request()` function, when throwing an error, should set the `.status` property of that error to the HTTP Response status code. The rationale is that the error status code is compared to `404` in `makaba` engine during `getThread()` call to determine whether it should look for the thread in the archive.
+
 0.4.22 / 08.08.2020
 ==================
 

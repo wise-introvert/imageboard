@@ -137,6 +137,8 @@
   // (на текущее время) "последним", "бампающим" данный тред.
   // Например, первый комментарий в треде, или 500-ый комментарий
   // в треде с "бамп-лимитом" в 500 и количеством постов больше 500.
+  // (что означает, что `lasthit` будет меньше `timestamp`а комментариев,
+  //  выходящих за "бамп-лимит").
   // Одно и то же значение у всех постов треда.
   // Также, возможно, является датой "последнего изменения" треда:
   // например, добавление постов, удаление постов, изменения статуса
@@ -269,6 +271,17 @@ HTML синтаксис сообщений:
   "files_count": 3, // Количество файлов, прикреплённых к постам треда (в данном случае, включая файлы заглавного поста, в отличие от `/catalog.json`, где они не включены).
   "unique_posters": 7, // Количество "уникальных" (по хешу подсети) пользователей, написавших комментарий в треде. Не включая заглавный пост треда по неведомой причине: автор треда посчитается только если он оставит комментарий в треде.
   "is_closed": 0, // `1`, если тред закрыт.
+
+  // (deprecated)
+  // "file_prefix", использовался для очень старых "архивных" тредов
+  // (с появления архива `2016-03-06` по `2016-11-12` включительно),
+  // и для тех старых тредов его требовалось подставлять к адресам
+  // прикреплённых к постам файлов.
+  // Например, для треда `https://2ch.hk/b/arch/2016-03-06/res/119034529.json`
+  // `file_prefix` — "../", поэтому адреса всех картинок в нём преобразуются
+  // из `thumb/119034529/14572604256670s.jpg` в
+  // `https://2ch.hk/b/arch/2016-03-06/thumb/119034529/14572604256670s.jpg`.
+  "file_prefix": "../",
 
   "title": "...", // Название треда. Видимо, то же самое, что `posts[0].subject`.
 
@@ -486,13 +499,67 @@ https://2ch.hk/makaba/mobile.fcgi?task=get_boards
 
 ### Поиск по всем постам доски
 
-https://2ch.hk/makaba/makaba.fcgi
+Поиск производится по подстроке в теме или тексте поста.
 
-`FormData`:
+`POST` https://2ch.hk/makaba/makaba.fcgi
 
-* `board` — "b"
-* `task` — "search"
-* `find` — "текст"
+Параметры:
+
+* `board: "доска"`
+* `task: "search"`
+* `find: "текст"`
+* `json: 1`
+
+Поиск прекращается на 50 постах.
+
+<details>
+<summary>Пример ответа. <code>board: "a"</code> <code>find: "гештальт"</code></summary>
+
+######
+
+```js
+{
+    "Board": "a",
+    "BoardName": "Аниме",
+    "posts": [
+        {
+            "banned": 0,
+            "closed": 0,
+            "comment": "<a href=\"/a/res/7052435.html#7054227\" class=\"post-reply-link\" data-thread=\"7052435\" data-num=\"7054227\">>>7054227</a><br><span class=\"unkfunc\">&gt; Я янгирефаг </span><br>Блэт, Воен Слова... Понятно всё. Фажество ничем не пронять.<br><span class=\"unkfunc\">&gt; Ее слили, когда она поддалась гг и пригласила ее на танец. Вот серьезно, какого черта она проявила симпатию к ДОБРОМУ герою?!</span><br>Жопочтец, ты? Жальтер всю главу участвовала в противостоянии с Сальтер и всячески пыталась её принизить, как и та её. Когда Сальтер получила Мастера, Жальтер тоже захотела, когда Сальтер приоделась в костюм, Жальтер пошла и нашла себе такой же, но лучше. И с танцем точно та же хуита. Сальтер решила выебнуться перед своей подругой по причёске и пригласила протагониста на танец, а Жальтер восприняла это как удар по самолюбию, ибо ей то не дали, вот она и доебалась до ГГ в конце. Просто чтобы закрыть гештальт и почувствовать себя победителем. Хуёво ты свою вайфу читаешь, я смотрю.<br><span class=\"unkfunc\">&gt; В других сингулярностях слуг призывал сам Грааль, как слуг Гоэтии.</span><br>В Лондоне призывателем был Зокен.<br><span class=\"unkfunc\">&gt; А откуда тогда альтер Сейбер в Фуюки? </span><br>Фуюки это Сингулярность о пятой войне(изменённой), там изначально была Сэйба, которая в процессе закорраптилась. И да, ты опять жопой читал. Сальтер в Фуюки как раз таки просекла, в чём заключался план Гоэтии, поэтому и решила взять всё под контроль, дабы противостоять ему.<br><br>",
+            "date": "01/12/20 Втр 14:40:42",
+            "email": "",
+            "endless": 0,
+            "files": [],
+            "lasthit": 1617977525,
+            "name": "Аноним",
+            "num": "7054236",
+            "op": 0,
+            "parent": "7052435",
+            "sticky": 0,
+            "subject": "",
+            "timestamp": 1606822842,
+            "trip": ""
+        }
+    ],
+    "search": "гештальт"
+}
+```
+</details>
+
+<details>
+<summary>Пример ответа "Не найдено". <code>board: "a"</code> <code>find: "перцепция"</code></summary>
+
+######
+
+```js
+{
+  "Board": "a",
+  "BoardName": "Аниме",
+  "posts": [],
+  "search": "перцепция"
+}
+```
+</details>
 
 ## Постинг
 
@@ -724,9 +791,270 @@ https://2ch.hk/makaba/makaba.fcgi
 
 ### Архив
 
-На каждой доске (судя по всему) есть "архив", куда помещаются все "потонувшие" треды. Судя по всему, "архив" появился в 2016-ом году, и с тех пор хранит каждый "потонувший" тред, в отличие от 4chan-а, который "архивирует" не все доски, а на тех, которые "архивирует", хранит максимум 3000 тредов, и не более трёх дней.
+На каждой доске (судя по всему) есть "архив", куда помещаются все "потонувшие" треды. Судя по всему, "архив" появился в 2016-ом году, и с тех пор хранит каждый "потонувший" тред, в отличие от 4chan-а, который "архивирует" не все доски, а только некоторые из них, и на тех, которые "архивирует", хранит максимум 3000 тредов, и не более трёх дней.
 
-Также, в отличие от 4chan-а, на котором все URL-ы остаются неизменными при попадании треда в "архив", на Дваче меняется URL доступа к тредам. Например, был — `/b/res/119034838.json`, стал — `/b/arch/2016-03-06/res/119034838.html`, где `2016-03-06` — это дата помещения треда в архив, и, как можно догадаться, "клиент", будь то браузер или мобильное приложение, не имеет возможности угадать путь к "архивированному" треду, кроме как перебором, но это дичь какая-то.
+Не на всех досках доступен архив: на некоторых досках (даже если они "юзердоски") он доступен (`law`, `who`, `kz`), а на некоторых досках он не доступен (например, `fi`, `ld`).
+
+Также, в отличие от 4chan-а, на котором все URL-ы остаются неизменными при попадании треда в "архив", на Дваче при перемещении треда в архив меняется его URL. Например, был — `/b/res/119034838.html`, стал — `/b/arch/2016-03-06/res/119034838.html`. Для файлов `*.html` работает перенаправление `301 Moved Permanently` из `/b/res/12345.html` в `/b/arch/res/12345.html`, а оттуда — перенаправление `302 Found` в `/b/arch/2016-03-06/res/12345.html`, где `2016-03-06` — это дата помещения треда в архив. Для файлов `*.json` не работает первое из этих перенаправлений: `/b/res/12345.json` просто выдаст `404 Not Found`, поэтому при получении ответа `404 Not Found` для `*.json`-а треда, всегда следует перепосылать запрос с префиксом `/arch/`, и в этом случае, если тред был перемещён в архив, произойдёт перенаправление `302 Found` в `/b/arch/2016-03-06/res/12345.json`.
+
+При этом в самих данных треда (`*.json`) не добавляется никакого поля в стиле `archived: 1` или `archived_on: 1234567890`. Но, при этом, в архивных тредах с появления архива `2016-03-06` по `2016-11-12` включительно проставлялось свойство `file_prefix: "../"`, а адреса картинок при этом были не абсолютными (`/b/thumb/12345/67890s.jpg`), а относительными (`thumb/12345/67890s.jpg`), поэтому при просмотре этих совсем старых архивных тредов требуется вручную преобразовывать адреса картинок, предварительно каким-то образом заполучив дату архивирования треда (например, из "конечного" адреса `*.json`-а треда после автоматического перенаправления).
+
+#### Поиск по архиву
+
+Поиск производится по заголовку треда.
+
+`POST` https://2ch.hk/api/archive/search
+
+```js
+{
+  board: "<доска>",
+  query: "<подстрока для поиска>" // без пробелов, без цифр.
+}
+```
+
+Ответ — документ `HTML` (даже если ошибка).
+
+Выдаётся максимум 21 результат, каждый раз в случайном порядке.
+
+<details>
+<summary>Пример ответа. <code>board: "b"</code> <code>query: "технологии"</code></summary>
+
+######
+
+```html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ru">
+  <head>
+    <title>
+      Архив
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="/newtest/resources/images/makaba.ico" rel="shortcut icon">
+    <link href="/makaba/templates/css/normalize.css" type="text/css" rel="stylesheet">
+    <link href="/makaba/templates/css/melchizedek.css?2" type="text/css" rel="stylesheet">
+    <link href="/makaba/templates/css/archive.css" type="text/css" rel="stylesheet">
+  </head>
+
+  <body>
+    <header class="header">
+      <a class="logo" href="/">Два.ч</a>
+    </header>
+
+    <div class="box">
+      <div class="box-header">
+        Архив /b /
+        <form action="/api/archive/search" method="POST" class="arch-searchform" enctype="multipart/form-data">
+          <input type="hidden" name="board" value="b">
+          <input type="text" name="query" value="" placeholder="текст">
+          <input type="submit" value="Найти">
+        </form>
+      </div>
+
+      <div class="box-data">
+
+        <a href="/b/arch/2021-01-11/res/237499388.html">Анон, каким ты видишь мир, через 50-100-200-500-1000 лет?
+          Какие технологии, какие города, чего достигло человечество. Политику не обсуждаем</a>
+        <span class="arch-threadnum">( 237499388 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2020-05-03/res/219328543.html">Лучшие технологии - Япония. Лучшие фильмы - Япония.</a>
+        <span class="arch-threadnum">( 219328543 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2021-01-30/res/238962974.html"> ИЗУЧАЛ ПРОГРАММИРОВАНИЕ, МАТЕМАТИКУ, ТЕХНОЛОГИИ,</a>
+        <span class="arch-threadnum">( 238962974 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2017-05-03/res/152228565.html">Подумываю вкатиться в IT. Какие нынче языки и технологии
+          востребованы, что учить и, главное, с чего начать?</a> <span class="arch-threadnum">( 152228565 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2017-09-20/res/161433184.html">ТЕХНОЛОГИИ И МЕДИА, 19 СЕН, 22:02 ФСБ и Роскомнадзор</a>
+        <span class="arch-threadnum">( 161433184 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2019-03-10/res/192702576.html">Лучшие технологии - Япония. Лучшие фильмы - США.</a>
+        <span class="arch-threadnum">( 192702576 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2018-01-04/res/168087077.html">Лучшие технологии - США. Лучшие фильмы - США.</a>
+        <span class="arch-threadnum">( 168087077 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2016-07-17/res/132012985.html">А что если взять наши современные технологии,</a>
+        <span class="arch-threadnum">( 132012985 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2018-12-01/res/187441268.html">Лучшие технологии - Россия. Лучшие фильмы - Россия.</a>
+        <span class="arch-threadnum">( 187441268 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2019-05-12/res/196196046.html">Почему технологии перестали развиваться, и вместо ощутимого
+          прогресса мы имеем каплевидный вырез в смартфоне? </a> <span class="arch-threadnum">( 196196046 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2019-10-11/res/205269957.html">Заканчиваю шарагу МГУ, биотехнологии, есть нихуёвые</a>
+        <span class="arch-threadnum">( 205269957 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2018-11-13/res/186483997.html">Почему кроме смартфонов за 20 лет не появилось ни одной
+          новой потребительской технологии? </a> <span class="arch-threadnum">( 186483997 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2016-12-20/res/142531251.html">Программист в треде. Могу пояснить за работу программистом и
+          технологии, в рамках того, что сам знаю. Задавайте свои ответы.</a>
+        <span class="arch-threadnum">( 142531251 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2017-05-23/res/153658212.html">Продвинутые технологии смогут создавать города за 1 день
+          http:&amp;#47;&amp;#47;oskarstalberg.com&amp;#47;game&amp;#47;CityGenerator&amp;#47; </a>
+        <span class="arch-threadnum">( 153658212 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2017-10-07/res/162454890.html">Смотрите, пацаны, все современные технологии</a>
+        <span class="arch-threadnum">( 162454890 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2016-10-25/res/138543605.html">Все технологии принадлежат паразитам, технологии</a>
+        <span class="arch-threadnum">( 138543605 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2020-11-25/res/234005159.html">Я вот одного не понимаю. 21 век век, нанотехнологии,</a>
+        <span class="arch-threadnum">( 234005159 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2018-10-23/res/185226008.html">Лучшие технологии - США. Лучшие фильмы - США.</a>
+        <span class="arch-threadnum">( 185226008 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2017-04-28/res/151943051.html">1. Какие технологии используются на 2ch.hk ? 2. Что</a>
+        <span class="arch-threadnum">( 151943051 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2017-05-19/res/153428789.html">Лучшие технологии - Россия. Лучшие фильмы - Россия.</a>
+        <span class="arch-threadnum">( 153428789 )</span>
+        <hr class="dotted">
+
+        <a href="/b/arch/2017-10-16/res/163075308.html">Взлетающих технологий тхред Обсуждаем, как технологии</a>
+        <span class="arch-threadnum">( 163075308 )</span>
+        <hr class="dotted">
+
+        <br>
+        <div class="pager">
+          [<a href="/b/arch/">0</a>]
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+```
+</details>
+
+<details>
+<summary>Пример ошибки "Запрос не валиден". <code>board: "b"</code> <code>query: "нано технологии"</code></summary>
+
+######
+
+```html
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ошибка</title>
+    <link href="/makaba/templates/css/normalize.css" type="text/css" rel="stylesheet">
+    <link href="/makaba/templates/css/melchizedek.css" type="text/css" rel="stylesheet">
+  </head>
+  <body>
+    <header class="header">
+      <a class="logo" href="/makaba/stickers/editor">Два.ч</a>
+    </header>
+    <div class="error-body">
+      <div class="error-body-error">
+        <div class="error-body-error-text">
+          <h1 class="error-title">Ошибка</h1>
+          <p>Ваш запрос не валиден.</p>
+        </div>
+        <div class="error-body-error-links">
+          <a class="button" href="/makaba/stickers/">Главная</a>
+          <a class="button" href="#" onclick="window.history.back();">Назад</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+```
+</details>
+
+<details>
+<summary>Пример ошибки "Доска не найдена". <code>board: "xxxxx"</code> <code>query: "технологии"</code></summary>
+
+######
+
+```html
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ошибка</title>
+    <link href="/makaba/templates/css/normalize.css" type="text/css" rel="stylesheet">
+    <link href="/makaba/templates/css/melchizedek.css" type="text/css" rel="stylesheet">
+  </head>
+
+  <body>
+    <header class="header">
+      <a class="logo" href="/makaba/stickers/editor">Два.ч</a>
+    </header>
+    <div class="error-body">
+      <div class="error-body-error">
+        <div class="error-body-error-text">
+          <h1 class="error-title">Ошибка</h1>
+          <p>Доска не существует.</p>
+        </div>
+        <div class="error-body-error-links">
+          <a class="button" href="/makaba/stickers/">Главная</a>
+          <a class="button" href="#" onclick="window.history.back();">Назад</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+```
+</details>
+
+<details>
+<summary>Пример ответа "Не найдено". <code>board: "b"</code> <code>query: "визуально-слуховой"</code></summary></summary>
+
+######
+
+```html
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ошибка</title>
+    <link href="/makaba/templates/css/normalize.css" type="text/css" rel="stylesheet">
+    <link href="/makaba/templates/css/melchizedek.css" type="text/css" rel="stylesheet">
+  </head>
+
+  <body>
+    <header class="header">
+      <a class="logo" href="/makaba/stickers/editor">Два.ч</a>
+    </header>
+    <div class="error-body">
+      <div class="error-body-error">
+        <div class="error-body-error-text">
+          <h1 class="error-title">Ошибка</h1>
+          <p>Ничего не найдено.</p>
+        </div>
+        <div class="error-body-error-links">
+          <a class="button" href="/makaba/stickers/">Главная</a>
+          <a class="button" href="#" onclick="window.history.back();">Назад</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+```
 
 ### Разделы 18+
 
