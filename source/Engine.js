@@ -261,9 +261,9 @@ export default class Engine {
 		}
 
 		const getMakabaOptions = () => {
-			// For ancient `2ch` (engine: "makaba") threads archived
-			// between `2016-03-06` and `2016-11-12`, transform relative
-			// attachment URLs to absolute ones.
+			// For ancient `2ch.hk` (engine: "makaba") threads archived
+			// between March 6th, 2016 and November 12th, 2016,
+			// transform relative attachment URLs to absolute ones.
 			// (`file_prefix` is "../" for those)
 			if (isArchived && this.options.engine === 'makaba' && response.file_prefix) {
 				return {

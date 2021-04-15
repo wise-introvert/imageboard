@@ -248,13 +248,20 @@ Available `options`:
 
 * `request(method: string, url: string, parameters: object?): Promise` — (required) Sends HTTP requests to imageboard API. Must return a `Promise` resolving to response text.
 
-Example:
-
 ```js
-request("GET", "https://8kun.top/boards.json") === "[{ "uri": "b", ... }, ...]"
+request("GET", "https://8kun.top/boards.json") === "[
+  { "uri": "b", "title": "Random" },
+  ...
+]"
 ```
 
-The `request()` function can also return a `Promise` resolving to an object of shape `{ response, url }` where `response` is the response text and `url` is the "final" URL (after any redirects): this `url` is used internally when requesting an archived thread from `makaba` engine in order to get its `archivedAt` timestamp that can only be obtained from the URL the engine redirects to.
+<details>
+<summary>Reading archived threads on <code>2ch.hk</code> imageboard requires modifying the <code>request()</code> return type a bit.</summary>
+
+######
+
+The `request()` function can also return a `Promise` resolving to an object of shape `{ response, url }` where `response` is the response text and `url` is the "final" URL (after any redirects): this `url` is used internally when requesting archived threads from `2ch.hk` imageboard in order to get their `archivedAt` timestamp that can only be obtained from the URL the engine redirects to.
+</details>
 
 * `commentUrl: string?` — (optional) A template for the `url` of all `type: "post-link"`s (links to other comments) in parsed comments' `content`. Is `"/{boardId}/{threadId}#{commentId}"` by default.
 
@@ -494,12 +501,13 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // Eventually, a thread is deleted from the archive too.
   // If a thread is archived, then it's locked too (by definition).
   isArchived: boolean?,
-  // If `isArchived` is `true`, then we assume that `archivedAt` is also present.
+  // If `isArchived` is `true`, then `archivedAt` date might be defined.
   // So far, only `4chan` and `2ch` seem to have the archive feature.
   // `4chan` provides both `isArchived` and `archivedAt` data in thread properties.
   // `2ch` doesn't provide such data, but the code employs some hacks
   // to find out whether a thread is archived, and, if it is, when has it been archived.
-  // So, in both cases, if `isArchived` is `true`, then `archivedAt` also exists.
+  // `2ch` requires the `request()` function to return a `{ response, url }` object
+  // in order to get the `archivedAt` date of an `isArchived` thread.
   archivedAt: Date?,
   // Was the "bump limit" reached for this thread already.
   // Is `false` when the thread is "sticky" or "rolling"
