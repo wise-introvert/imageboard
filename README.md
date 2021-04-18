@@ -2,6 +2,8 @@
 
 An easy uniform wrapper over the popular imageboards' API.
 
+[More on each engine's API](#imageboards-api)
+
 Originally created as part of the [`captchan`](https://gitlab.com/catamphetamine/captchan) imageboard GUI.
 
 Supported engines:
@@ -26,8 +28,6 @@ Supported engines:
 * [makaba](https://2ch.hk/api/)
 
   1. [2ch.hk](https://2ch.hk/) — [demo](https://captchan.surge.sh/2ch)
-
-[More on each engine's API](#imageboards-api)
 
 Features:
 
