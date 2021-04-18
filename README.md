@@ -27,6 +27,8 @@ Supported engines:
 
   1. [2ch.hk](https://2ch.hk/) — [demo](https://captchan.surge.sh/2ch)
 
+[More on each engine's API](#imageboards-api)
+
 Features:
 
 * (optional) Parse comments HTML into structured JSON documents.
