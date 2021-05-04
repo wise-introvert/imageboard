@@ -21,6 +21,7 @@
 	"threadUrl": "/{boardId}/thread/{threadId}",
 	"commentUrl": "/{boardId}/thread/{threadId}#p{commentId}",
 	"authorBadgeUrl": "https://s.4cdn.org/image/flags/{boardId}/{0}.gif",
+	"authResetUrl": "https://www.4chan.org/pass?reset",
 	"api": {
 		"getThread": "https://a.4cdn.org/{boardId}/thread/{threadId}.json",
 		"getThreads": "https://a.4cdn.org/{boardId}/catalog.json",
@@ -28,6 +29,11 @@
 		"post": {
 			"method": "POST",
 			"url": "https://sys.4chan.org/{boardId}/post",
+			"urlParameters": {
+				"boardId": {
+					"parameter": "boardId"
+				}
+			},
 			"responseType": "text/html",
 			"parameters": {
 				"mode": {
@@ -72,6 +78,11 @@
 		"report": {
 			"method": "POST",
 			"url": "https://sys.4chan.org/{boardId}/imgboard.php",
+			"urlParameters": {
+				"boardId": {
+					"parameter": "boardId"
+				}
+			},
 			"responseType": "text/html",
 			"parameters": {
 				"mode": {
@@ -84,6 +95,30 @@
 					"parameter": "captchaSolution"
 				}
 			}
+		},
+		"logIn": {
+			"method": "POST",
+			"url": "https://sys.4chan.org/auth",
+			"responseType": "text/html",
+			"parameters": {
+				"act": {
+					"value": "do_login"
+				},
+				"id": {
+					"parameter": "authToken"
+				},
+				"pin": {
+					"parameter": "authTokenPassword"
+				},
+				"long_login": {
+					"value": "yes"
+				}
+			}
+		},
+		"logOut": {
+			"method": "POST",
+			"url": "https://sys.4chan.org/auth",
+			"responseType": "text/html"
 		}
 	}
 }

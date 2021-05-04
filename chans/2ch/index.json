@@ -8,6 +8,7 @@
 	},
 	"threadUrl": "/{boardId}/res/{threadId}.html",
 	"commentUrl": "/{boardId}/res/{threadId}.html#{commentId}",
+	"authResetUrl": "https://2ch.hk/makaba/makaba.fcgi?task=restore",
 	"api": {
 		"getThread": "/{boardId}/res/{threadId}.json",
 		"getArchivedThread": "/{boardId}/arch/res/{threadId}.json",
@@ -26,7 +27,7 @@
 					}
 				}
 			},
-			"query": {
+			"parameters": {
 				"board": {
 					"parameter": "boardId"
 				},
@@ -37,7 +38,7 @@
 		},
 		"post": {
 			"method": "POST",
-			"url": "/makaba/posting.fcgi?json=1",
+			"url": "/makaba/posting.fcgi",
 			"parameters": {
 				"task": {
 					"value": "post"
@@ -86,6 +87,48 @@
 				},
 				"2chaptcha_id": {
 					"parameter": "captchaId"
+				}
+			}
+		},
+		"report": {
+			"method": "POST",
+			"url": "/makaba/makaba.fcgi?json=1",
+			"parameters": {
+				"task": {
+					"value": "report"
+				},
+				"board": {
+					"parameter": "boardId"
+				},
+				"thread": {
+					"parameter": "threadId"
+				},
+				"posts": {
+					"parameter": "commentId"
+				},
+				"comment": {
+					"parameter": "content"
+				}
+			}
+		},
+		"logIn": {
+			"method": "POST",
+			"url": "/makaba/makaba.fcgi?json=1",
+			"parameters": {
+				"task": {
+					"value": "auth"
+				},
+				"usercode": {
+					"parameter": "authToken"
+				}
+			}
+		},
+		"logOut": {
+			"method": "POST",
+			"url": "/makaba/posting.fcgi?json=1",
+			"parameters": {
+				"task": {
+					"value": "logout"
 				}
 			}
 		}

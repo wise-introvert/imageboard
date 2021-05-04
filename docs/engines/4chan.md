@@ -492,7 +492,7 @@ Parameters:
 * `resto` — Thread ID.
 * `name` — Author's name (optional).
 * `email` — Author's email (optional).
-* `pwd` — "Pass" code (optional).
+* `pwd` — "Pass" id (optional). See the "Pass" section for more info.
 * `com` — Comment text.
 * `flag` — Some boards support board-specific "flags" (icons). For example, on `/pol/` board those "flags" indicate comment author's "political preferences". (optional).
 * `upfile` — Attachment file binary object (optional).
@@ -536,12 +536,13 @@ Same as posting a comment, but without `resto` and with:
 
 ### Report a post
 
-`POST` (?) or `GET` (?) to `https://sys.4chan.org/{boardId}/imgboard.php`
+`POST` to `https://sys.4chan.org/{boardId}/imgboard.php`
 
 Parameters:
 
 * `mode` — `"report"`
-* `no` — Reported comment or thread ID
+* `no` — Reported comment or thread ID.
+* `cat_id` — Report category id (a number) (required). Each board has its own set of report categories. There're a lot of them, and there seems to be no way of getting that info via a JSON API.
 * `recaptcha_challenge_field` — (Alternative?) CAPTCHA "challenge" id.
 * `recaptcha_response_field` — (Alternative?) CAPTCHA "challenge" solution.
 * `g-recaptcha-response` — Google ReCaptcha solution.
@@ -570,13 +571,58 @@ Known error messages:
 * Cases when the user is banned
 * ...
 
-<!--
-### Passcodes
+Since there seems to be no API for getting a list of valid report categories for a board, it's not clear how to report posts on 4chan in a mobile app. There is a workaround though — opening a new window with a dedicated report page on `4chan.org`. The URL of the page is the same as the one of the POST API, with the same `mode` and `no` parameters: `https://sys.4chan.org/{boardId}/imgboard.php?mode=report&no=12345678`.
+
+### Pass
 
 To apply a "pass" code when posting a comment, `4chan_apass` and `4chan_auser` cookies should be set.
 
-`4chan_auser` is the username, `4chan_apass` is the password.
--->
+To log in with a "pass", send a `POST` request to `https://sys.4chan.or/auth` with parameters:
+
+* `act` — `"do_login"`
+* `id` — The "pass".
+* `pin` — The PIN code for the "pass".
+* `long_login` — (optional) Set to `"yes"` (or maybe to any other non-empty string) to "remember the device" for 1 year. Basically, the cookie lifetime.
+
+Response example:
+
+```html
+...
+Your device is now authorized
+...
+```
+
+The server sets a `pass_id` cookie with some value. Some code on the internet says that the value of the cookie can be `"0"`, in which case it should be ignored. Maybe that's no longer the case.
+
+Error examples:
+
+```html
+...
+Your Token must be exactly 10 characters
+...
+```
+
+```html
+...
+You have left one or more fields blank
+...
+```
+
+```html
+...
+Incorrect Token or PIN
+...
+```
+
+Some other error message regexp:
+
+```html
+...
+<strong style=\"color: red; font-size: larger;\">(.*?)</strong>
+...
+```
+
+To log out, send the same `POST` request but without any parameters.
 
 ### Roles
 
