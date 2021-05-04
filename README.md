@@ -504,12 +504,14 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // If a thread is archived, then it's locked too (by definition).
   isArchived: boolean?,
   // If `isArchived` is `true`, then `archivedAt` date might be defined.
-  // So far, only `4chan` and `2ch` seem to have the archive feature.
-  // `4chan` provides both `isArchived` and `archivedAt` data in thread properties.
-  // `2ch` doesn't provide such data, but the code employs some hacks
-  // to find out whether a thread is archived, and, if it is, when has it been archived.
-  // `2ch` requires the `request()` function to return a `{ response, url }` object
-  // in order to get the `archivedAt` date of an `isArchived` thread.
+  // So far, only `4chan`, `makaba` and `lynxchan` seem to have the archive feature.
+  // * `4chan` provides both `isArchived` and `archivedAt` data in thread properties.
+  // * `makaba` doesn't provide such data, but the code employs some hacks
+  //   to find out whether a thread is archived, and, if it is, when has it been archived.
+  //   `makaba` requires the `request()` function to return a `{ response, url }` object
+  //   in order to get the `archivedAt` date of an `isArchived` thread.
+  // * `lynxchan` allows admins or moderators to manually archive threads,
+  //   but doesn't provide `archivedAt` date.
   archivedAt: Date?,
   // Was the "bump limit" reached for this thread already.
   // Is `false` when the thread is "sticky" or "rolling"

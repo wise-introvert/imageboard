@@ -10,6 +10,7 @@ export default function parseThread({
 	locked,
 	pinned,
 	cyclic,
+	archived,
 	autoSage,
 	lastBump,
 	forceAnonymity,
@@ -28,6 +29,11 @@ export default function parseThread({
 		isRolling: cyclic,
 		commentsCount: getCommentsCount(postCount, posts),
 		attachmentsCount: getAttachmentsCount(fileCount, posts, files)
+	}
+	// LynxChan allows manually archiving a thread by an admin or a moderator.
+	if (archived) {
+		thread.isArchived = true
+		// LynxChan doesn't provide an `archivedAt` date.
 	}
 	// `autoSage: true` can be set on a "sticky" thread for example.
 	if (autoSage) {
