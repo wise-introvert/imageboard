@@ -105,7 +105,8 @@ export default function parseComment(post, {
 		// displays poster country flags.
 		// `8ch.net` and `4chan.org` have correct country codes.
 		// Examples: "GB", "US", "RU".
-		authorCountry: post.country,
+		// Can be "XX if unknown" according to the official 4chan API docs.
+		authorCountry: post.country === 'XX' ? undefined : post.country,
 		// Country names should be displayed by the app
 		// from its own "country code to country name" dictionary.
 		// authorCountryName: post.country_name,
