@@ -133,10 +133,12 @@ export default function parseComment(post, {
 		})
 	}
 	// Sometimes on `4chan.org` (for example, on `/pol/`)
-	// there's `troll_country` instead of `country`.
-	if (post.troll_country) {
-		comment.authorBadgeUrl = authorBadgeUrl.replace('{0}', post.troll_country.toLowerCase())
-		comment.authorBadgeName = post.country_name
+	// there're board-specific flags (like "political preferences" flags).
+	if (post.board_flag) {
+		comment.authorBadgeUrl = authorBadgeUrl
+			.replace('{boardId}', boardId)
+			.replace('{0}', post.board_flag.toLowerCase())
+		comment.authorBadgeName = post.flag_name
 	}
 	return comment
 }

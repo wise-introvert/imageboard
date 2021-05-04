@@ -20,10 +20,70 @@
 	"fileAttachmentUrl": "https://i.4cdn.org/{boardId}/{originalName}{ext}",
 	"threadUrl": "/{boardId}/thread/{threadId}",
 	"commentUrl": "/{boardId}/thread/{threadId}#p{commentId}",
-	"authorBadgeUrl": "https://s.4cdn.org/image/country/troll/{0}.gif",
+	"authorBadgeUrl": "https://s.4cdn.org/image/flags/{boardId}/{0}.gif",
 	"api": {
 		"getThread": "https://a.4cdn.org/{boardId}/thread/{threadId}.json",
 		"getThreads": "https://a.4cdn.org/{boardId}/catalog.json",
-		"getBoards": "https://a.4cdn.org/boards.json"
+		"getBoards": "https://a.4cdn.org/boards.json",
+		"post": {
+			"method": "POST",
+			"url": "https://sys.4chan.org/{boardId}/post",
+			"responseType": "text/html",
+			"parameters": {
+				"mode": {
+					"value": "regist"
+				},
+				"resto": {
+					"parameter": "threadId"
+				},
+				"name": {
+					"parameter": "authorName"
+				},
+				"email": {
+					"parameter": "authorEmail"
+				},
+				"pwd": {
+					"parameter": "accessToken"
+				},
+				"sub": {
+					"parameter": "title"
+				},
+				"com": {
+					"parameter": "content"
+				},
+				"upfile": {
+					"parameter": "attachments",
+					"index": 0
+				},
+				"spoiler": {
+					"parameter": "attachmentSpoiler"
+				},
+				"filetag": {
+					"parameter": "attachmentFileTag"
+				},
+				"textonly": {
+					"parameter": "isTextOnly"
+				},
+				"g-recaptcha-response": {
+					"parameter": "captchaSolution"
+				}
+			}
+		},
+		"report": {
+			"method": "POST",
+			"url": "https://sys.4chan.org/{boardId}/imgboard.php",
+			"responseType": "text/html",
+			"parameters": {
+				"mode": {
+					"value": "report"
+				},
+				"no": {
+					"parameter": "commentId"
+				},
+				"g-recaptcha-response": {
+					"parameter": "captchaSolution"
+				}
+			}
+		}
 	}
 }

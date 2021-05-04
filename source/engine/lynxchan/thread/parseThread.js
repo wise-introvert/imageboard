@@ -13,7 +13,6 @@ export default function parseThread({
 	archived,
 	autoSage,
 	lastBump,
-	forceAnonymity,
 	maxFileCount,
 	maxMessageLength,
 	postCount,
@@ -42,12 +41,6 @@ export default function parseThread({
 	// `lastBump` is only present in `/catalog.json` API response.
 	if (lastBump) {
 		thread.updatedAt = new Date(lastBump)
-	}
-	// Only for "get thread" API response.
-	if (forceAnonymity) {
-		// `forceAnonymity: true` disables author names in a thread:
-		// forces empty/default `name` on all posts of a thread.
-		thread.forceAnonymity = true
 	}
 	return thread
 }

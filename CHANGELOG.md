@@ -1,3 +1,16 @@
+0.4.37 / 04.05.2021
+==================
+
+* Updated `makaba` engine: new voting API response.
+
+* Updated `4chan` engine to use the new ["Board Flags"](https://github.com/4chan/4chan-API/commit/d095a7af76d0a5a48e3008fb9a05e5b3bbb6c2bb) feature.
+
+* Updated engine docs: `4chan`, `makaba`.
+
+* Refactored voting API code.
+
+* Added some basic posting API code (not tested).
+
 0.4.35 / 08.04.2021
 ==================
 

@@ -5,7 +5,8 @@ export default {
     "maxAttachments": 4,
     "maxAttachmentSize": 134217728,
     "maxCommentLength": 16384,
-    "title": "Animu"
+    "title": "Animu",
+    "forceAnonymity": true
   },
   title: "Was ist dieses Anime",
   createdAt: new Date("2019-06-01T16:10:01.564Z"),
@@ -98,6 +99,5 @@ export default {
     }
   ],
   commentsCount: 2,
-  attachmentsCount: 3,
-  forceAnonymity: true
+  attachmentsCount: 3
 }

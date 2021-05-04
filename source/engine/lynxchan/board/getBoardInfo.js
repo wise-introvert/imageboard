@@ -1,10 +1,13 @@
 export default function getBoardInfo({
 	boardName,
+	// `boardDescription` is `"."` on all boards on `kohlchan.net`
 	flagData,
 	captcha,
 	maxMessageLength,
 	maxFileCount,
-	maxFileSize
+	maxFileSize,
+	textBoard,
+	forceAnonymity
 }) {
 	const board = {
 		maxCommentLength: maxMessageLength,
@@ -20,8 +23,19 @@ export default function getBoardInfo({
 	if (flagData) {
 		board.badges = flagData.map(({ _id, name }) => ({ id: _id, title: name }))
 	}
+	// Whether the thread requires solving a CAPTCHA in order to post a comment.
 	if (captcha) {
 		board.captcha = true
+	}
+	// Whether the board doesn't allow posting attachments.
+	if (textBoard) {
+		board.isTextOnly = true
+	}
+	// Only for "get thread" API response.
+	if (forceAnonymity) {
+		// `forceAnonymity: true` disables author names on a board:
+		// forces empty/default `name` on all posts in all threads of the board.
+		board.forceAnonymity = true
 	}
 	return board
 }

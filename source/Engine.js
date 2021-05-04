@@ -2,6 +2,7 @@ import parseAndFormatCommentContent from './parseAndFormatCommentContent'
 
 import convertDateToUtc0 from './utility/convertDateToUtc0'
 import joinPath from './utility/joinPath'
+import { getParameters, setParameters, addQueryParameters } from './utility/parameters'
 
 export default class Engine {
 	constructor(chanSettings, {
@@ -300,15 +301,19 @@ export default class Engine {
 		const voteApi = this.options.api.vote
 		const method = voteApi.method
 		const responseType = voteApi.responseType || 'application/json'
-		const urlParameters = getVoteParameters(voteApi, params)
-		const queryParameters = voteApi.query && getVoteParameters(voteApi.query, params)
-		// The API endpoint URL.
-		const url = this.toAbsoluteUrl(setParameters(voteApi.url, urlParameters))
+		// Get API endpoint URL.
+		let url = voteApi.url
+		if (voteApi.urlParameters) {
+			const urlParameters = getParameters(voteApi.urlParameters, params)
+			url = setParameters(url, urlParameters)
+		}
+		url = this.toAbsoluteUrl(url)
 		// Send a request to the API endpoint.
 		// Strangely, `2ch.hk` requires sending a `GET` HTTP request in order to vote.
 		let response
 		switch (method) {
 			case 'GET':
+				const queryParameters = voteApi.query && getParameters(voteApi.query, params)
 				response = await this.request('GET', addQueryParameters(url, queryParameters), {
 					headers: {
 						'Accept': responseType
@@ -316,8 +321,9 @@ export default class Engine {
 				})
 				break
 			default:
+				const parameters = voteApi.parameters && getParameters(voteApi.parameters, params)
 				response = await this.request(method, url, {
-					body: queryParameters && JSON.stringify(queryParameters),
+					body: parameters && JSON.stringify(parameters),
 					headers: {
 						'Content-Type': 'application/json',
 						'Accept': responseType
@@ -327,6 +333,61 @@ export default class Engine {
 		}
 		// Parse vote status.
 		return this.parseVoteResponse(response)
+	}
+
+	/**
+	 * Performs a "post" API request and parses the response.
+	 * @param  {object} parameters — `{ boardId, threadId?, authorName?, authorEmail?, title?, content?, attachments?, attachmentSpoiler?, attachmentFileTag?, isTextOnly?, accessToken?, captchaId?, captchaSolution? }`.
+	 * @return {object} Returns an object of shape: `{ threadId: number, commentId: number? }`. Throws an error in case of an error. If the error is "banned" then the error may have properties: `banId`, `banReason`, `banBoardId`, `banEndsAt`.
+	 */
+	async post(params) {
+		const postApi = this.options.api.post
+		const method = postApi.method
+		const responseType = postApi.responseType || 'application/json'
+		// The API endpoint URL.
+		const url = this.toAbsoluteUrl(setParameters(postApi.url, params))
+		const parameters = postApi.parameters && getParameters(postApi.parameters, params)
+		const response = await this.request(method, url, {
+			body: parameters && JSON.stringify(parameters),
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': responseType
+			}
+		})
+		// Parse API response.
+		return this.parsePostResponse(response)
+	}
+
+	/**
+	 * Performs a "report" API request and parses the response.
+	 * @param  {object} parameters — `{ boardId, commentId }`.
+	 * @return
+	 */
+	async report(params) {
+		// 4chan:
+		// POST or GET https://sys.4chan.org/{boardId}/imgboard.php
+		// mode: "report"
+		// no: "{commentId}"
+		// recaptcha_challenge_field
+		// recaptcha_response_field
+		const reportApi = this.options.api.report
+		let {
+			url,
+			method,
+			responseType = 'application/json'
+		} = reportApi
+		// The API endpoint URL.
+		url = this.toAbsoluteUrl(setParameters(url, params))
+		const parameters = postApi.parameters && getParameters(postApi.parameters, params)
+		const response = await this.request(method, url, {
+			body: parameters && JSON.stringify(parameters),
+			headers: {
+				'Content-Type': 'application/json',
+				'Accept': responseType
+			}
+		})
+		// Parse API response.
+		return this.parseReportResponse(response)
 	}
 
 	/**
@@ -350,38 +411,4 @@ export default class Engine {
 
 function isJson(response) {
 	return Array.isArray(response) || typeof response === 'object'
-}
-
-function setParameters(string, parameters) {
-	for (const key of Object.keys(parameters)) {
-		string = string.replace('{' + key + '}', parameters[key])
-	}
-	return string
-}
-
-function getVoteParameters(config, parameters) {
-	const {
-		params,
-		voteParam,
-		voteParamUp,
-		voteParamDown
-	} = config
-	let voteParameters
-	if (params) {
-		voteParameters = JSON.parse(setParameters(params, parameters))
-	}
-	if (voteParam) {
-		if (!voteParameters) {
-			voteParameters = {}
-		}
-		voteParameters[voteParam] = parameters.up ? voteParamUp : voteParamDown
-	}
-	return voteParameters
-}
-
-function addQueryParameters(url, parameters) {
-	if (parameters) {
-		return url + '?' + Object.keys(parameters).map(key => `${key}=${parameters[key]}`).join('&')
-	}
-	return url
 }
