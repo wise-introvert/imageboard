@@ -7,7 +7,12 @@ const BANNED_REG_EXP = /<h2>([^<]+)<span class=\"banType\">([^<]+)<\/span>([^<]+
 const ERROR_REG_EXP = /id=\"errmsg\"[^>]*>([^<]+)/
 const GENERIC_ERROR_REG_EXP = /<h3>(?:<font[^>]*>)?([^<]+)/
 
-export default function parseReportResponse(response) {
+/**
+ * Performs a "post" API request and parses the response.
+ * @param  {string} response — API response HTML.
+ * @return {number} Returns new thread ID or new comment ID. Throws an error in case of an error. If the error is "banned" then the error message is "BANNED" and the error object may have properties: `banReason`.
+ */
+export default function parsePostResponse(response) {
 	if (SUCCESS_REG_EXP.test(response)) {
 		const idsMatch = response.match(IDS_REG_EXP)
 		if (idsMatch) {
@@ -15,13 +20,11 @@ export default function parseReportResponse(response) {
 			let commentId = parseInt(idsMatch[2])
 			// "API strangely uses postNo instead of threadNo when you post a new thread"
 			if (threadId === 0) {
-				threadId = commentId
-				commentId = undefined
+				// Posted a new thread.
+				return commentId
 			}
-			return {
-				threadId,
-				commentId
-			}
+			// Posted a new comment.
+			return commentId
 		}
 		return {}
 	}

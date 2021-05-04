@@ -1,7 +1,7 @@
 /**
  * Performs a "post" API request and parses the response.
- * @param  {object} parameters — `{ boardId, threadId?, authorName?, authorEmail?, title?, content?, attachments?, attachmentSpoiler?, attachmentFileTag?, isTextOnly?, accessToken?, captchaId?, captchaSolution? }`.
- * @return {object} Returns an object of shape: `{ threadId: number, commentId: number? }`. Throws an error in case of an error. If the error is "banned" then the error may have properties: `banId`, `banReason`, `banBoardId`, `banEndsAt`.
+ * @param  {object} response — API response JSON.
+ * @return {number} Returns new thread ID or new comment ID. Throws an error in case of an error. If the error is "banned" then the errorthen the error message is "BANNED" and the error object may have properties: `banId`, `banReason`, `banBoardId`, `banEndsAt`.
  */
 export default function parsePostResponse(response) {
 	if (response.Error) {
@@ -51,6 +51,11 @@ export default function parsePostResponse(response) {
 	if (response.Status !== 'OK') {
 		throw new Error(response.Status)
 	}
+	if (response.Status === 'Redirect') {
+		// Posted a new thread.
+		return response.Target
+	}
+	// Posted a new comment.
 	return response.Num
 }
 

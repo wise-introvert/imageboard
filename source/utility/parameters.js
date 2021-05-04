@@ -74,7 +74,9 @@ function convertValue(value, type) {
 
 export function addQueryParameters(url, parameters) {
 	if (parameters) {
-		return url + '?' + Object.keys(parameters).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(parameters[key])}`).join('&')
+		return url +
+			(url.indexOf('?') < 0 ? '?' : '&') +
+			Object.keys(parameters).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(parameters[key])}`).join('&')
 	}
 	return url
 }

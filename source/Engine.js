@@ -298,96 +298,82 @@ export default class Engine {
 	 * @return {boolean} — Returns `true` if the vote has been accepted.  Returns `false` if the user has already voted for this thread or comment.
 	 */
 	async vote(params) {
-		const voteApi = this.options.api.vote
-		const method = voteApi.method
-		const responseType = voteApi.responseType || 'application/json'
-		// Get API endpoint URL.
-		let url = voteApi.url
-		if (voteApi.urlParameters) {
-			const urlParameters = getParameters(voteApi.urlParameters, params)
-			url = setParameters(url, urlParameters)
-		}
-		url = this.toAbsoluteUrl(url)
-		// Send a request to the API endpoint.
-		// Strangely, `2ch.hk` requires sending a `GET` HTTP request in order to vote.
-		let response
-		switch (method) {
-			case 'GET':
-				const queryParameters = voteApi.query && getParameters(voteApi.query, params)
-				response = await this.request('GET', addQueryParameters(url, queryParameters), {
-					headers: {
-						'Accept': responseType
-					}
-				})
-				break
-			default:
-				const parameters = voteApi.parameters && getParameters(voteApi.parameters, params)
-				response = await this.request(method, url, {
-					body: parameters && JSON.stringify(parameters),
-					headers: {
-						'Content-Type': 'application/json',
-						'Accept': responseType
-					}
-				})
-				break
-		}
-		// Parse vote status.
-		return this.parseVoteResponse(response)
+		return this.parseVoteResponse(await this.sendRequest(this.options.api.vote, params))
 	}
 
 	/**
 	 * Performs a "post" API request and parses the response.
 	 * @param  {object} parameters — `{ boardId, threadId?, authorName?, authorEmail?, title?, content?, attachments?, attachmentSpoiler?, attachmentFileTag?, isTextOnly?, accessToken?, captchaId?, captchaSolution? }`.
-	 * @return {object} Returns an object of shape: `{ threadId: number, commentId: number? }`. Throws an error in case of an error. If the error is "banned" then the error may have properties: `banId`, `banReason`, `banBoardId`, `banEndsAt`.
+	 * @return {number} Returns new thread ID or new comment ID. Throws an error in case of an error. If the error is "banned" then the error may have properties: `banId`, `banReason`, `banBoardId`, `banEndsAt`.
 	 */
 	async post(params) {
-		const postApi = this.options.api.post
-		const method = postApi.method
-		const responseType = postApi.responseType || 'application/json'
-		// The API endpoint URL.
-		const url = this.toAbsoluteUrl(setParameters(postApi.url, params))
-		const parameters = postApi.parameters && getParameters(postApi.parameters, params)
-		const response = await this.request(method, url, {
-			body: parameters && JSON.stringify(parameters),
-			headers: {
-				'Content-Type': 'application/json',
-				'Accept': responseType
-			}
-		})
-		// Parse API response.
-		return this.parsePostResponse(response)
+		return this.parseLogInResponse(await this.sendRequest(this.options.api.post, params))
 	}
 
 	/**
 	 * Performs a "report" API request and parses the response.
-	 * @param  {object} parameters — `{ boardId, commentId }`.
-	 * @return
+	 * @param  {object} parameters — `{ boardId, commentId, content }`.
+	 * @return {void} Throws in case of an error.
 	 */
 	async report(params) {
-		// 4chan:
-		// POST or GET https://sys.4chan.org/{boardId}/imgboard.php
-		// mode: "report"
-		// no: "{commentId}"
-		// recaptcha_challenge_field
-		// recaptcha_response_field
-		const reportApi = this.options.api.report
+		return this.parseLogInResponse(await this.sendRequest(this.options.api.report, params))
+	}
+
+	/**
+	 * Performs a "log in" API request and parses the response.
+	 * @param  {object} parameters — `{ authToken, authTokenPassword }`.
+	 * @return {string} Returns an "access token". Throws in case of an error.
+	 */
+	async logIn(params) {
+		return this.parseLogInResponse(await this.sendRequest(this.options.api.logIn, params))
+	}
+
+	/**
+	 * Performs a "log out" API request and parses the response.
+	 * @return {string} Returns an "access token". Throws in case of an error.
+	 */
+	async logOut() {
+		return this.parseLogOutResponse(await this.sendRequest(this.options.api.logOut))
+	}
+
+	/**
+	 * Sends an HTTP request to the API.
+	 * @param  {object} options — Request options (URL, method, etc).
+	 * @param  {object} [params] — Request parameters.
+	 * @return {(object|string)} [response]
+	 */
+	async sendRequest(options, params) {
 		let {
 			url,
+			urlParameters,
 			method,
-			responseType = 'application/json'
-		} = reportApi
-		// The API endpoint URL.
-		url = this.toAbsoluteUrl(setParameters(url, params))
-		const parameters = postApi.parameters && getParameters(postApi.parameters, params)
-		const response = await this.request(method, url, {
-			body: parameters && JSON.stringify(parameters),
+			responseType = 'application/json',
+			parameters
+		} = options
+		let contentType
+		let body
+		// Get the API endpoint URL.
+		if (urlParameters) {
+			url = setParameters(url, getParameters(urlParameters, params))
+		}
+		url = this.toAbsoluteUrl(url)
+		// Apply parameters.
+		if (parameters) {
+			if (method === 'GET') {
+				url = addQueryParameters(url, getParameters(parameters, params))
+			} else {
+				body = JSON.stringify(getParameters(parameters, params))
+				contentType = 'application/json'
+			}
+		}
+		// Send HTTP request.
+		return await this.request(method, url, {
+			body,
 			headers: {
-				'Content-Type': 'application/json',
+				'Content-Type': contentType,
 				'Accept': responseType
 			}
 		})
-		// Parse API response.
-		return this.parseReportResponse(response)
 	}
 
 	/**
