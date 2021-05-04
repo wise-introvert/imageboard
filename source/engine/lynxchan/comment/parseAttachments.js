@@ -15,10 +15,12 @@ export default function parseAttachments(post, {
 	if (!files) {
 		if (post.thumb) {
 			isLynxChanCatalogAttachmentsBug = true
+			// A stub for the absent `files` bug in `/catalog.json` API response.
 			files = [{
-				// A stub for the absent `files` bug in `/catalog.json` API response.
-				// http://lynxhub.com/lynxchan/res/722.html#q984
-				mime: getPictureTypeFromUrl(post.thumb, chan),
+				// `mime`-type of `thumb` has been added in `catalog.json` response
+				// in LynxChan `2.5.0` on about `24 Aug, 2020`.
+				// https://gitgud.io/LynxChan/LynxChan/-/blob/3fe64b5db082a80732435492020dad84db2fe8f8/doc/Json.txt
+				mime: post.mime || getPictureTypeFromUrl(post.thumb, chan),
 				// `lynxchan` doesn't provide `width` and `height`
 				// neither for the picture not for the thumbnail
 				// in `/catalog.json` API response (which is a bug).
