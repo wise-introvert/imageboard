@@ -1,5 +1,7 @@
 `kohlchan.net` uses a customized version of `lynxchan` engine.
 
+### CAPTCHA
+
 To request a CAPTCHA, send a `GET` request to `/captcha.js?d={date}` where `{date}` can be a stringified javascript `Date`, for example `Wed%20May%2005%202021%2000:59:20%20GMT+0300%20(Moscow%20Standard%20Time)`.
 
 The response is HTTP status `302` with `Location` HTTP header being `/.global/captchas/{captchaId}`. Example of `{captchaId}`: `6091c3b9bce7b946ae3c9539`.
