@@ -137,7 +137,7 @@ export default function parseComment(post, {
 	if (post.board_flag) {
 		comment.authorBadgeUrl = authorBadgeUrl
 			.replace('{boardId}', boardId)
-			.replace('{0}', post.board_flag.toLowerCase())
+			.replace('{flagId}', post.board_flag.toLowerCase())
 		comment.authorBadgeName = post.flag_name
 	}
 	return comment
