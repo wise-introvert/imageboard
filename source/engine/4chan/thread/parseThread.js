@@ -33,6 +33,8 @@ export default function parseThread({
 		// `8ch.net` has `cyclical="0"` property.
 		// I guess it's for "rolling" threads.
 		// Seems that it's always "0" though.
+		// Weird that it's a string rather than a number
+		// like it is for `sticky` or `locked`.
 		isRolling: cyclical === '1',
 		// Not including the "opening comment".
 		// `vichan` and `OpenIB` don't have `replies` property
@@ -58,6 +60,8 @@ export default function parseThread({
 	// https://twitter.com/infinitechan/status/555013038839848961
 	// In other words, "bumplocked" threads are never bumped.
 	// I guess it can be set both when a thread is created and later too.
+	// Weird that it's a string rather than a number
+	// like it is for `sticky` or `locked`.
 	if (bumplocked === '1') {
 		thread.isBumpLimitReached = true
 	}

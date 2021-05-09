@@ -62,12 +62,23 @@ export default class FourChan extends Engine {
 			comments
 		} = parseThreadResponse(response)
 		// Fix incorrect attachments count for certain engines.
-		// https://github.com/OpenIB/OpenIB/issues/295
+		//
 		// `8ch.net` returns incorrect `images` count:
 		// for example, a thread having `6` replies and `3` images
 		// (one image being part of the "opening post")
 		// `replies` is `6` (correct) but `images` and `omitted_images` are both `1`.
+		// https://github.com/OpenIB/OpenIB/issues/295
+		//
+		// Or, in `/catalog.json`, it can sometimes be as weird as:
+		// {
+		// 	"omitted_posts": 249,
+		// 	"omitted_images": 250,
+		// 	"replies": 250,
+		// 	"images": 1,
+		// }
+		//
 		// Therefore, attachments are counted "by hand" in case of `8ch.net` (OpenIB).
+		//
 		// `vichan` also has the same bug:
 		// https://github.com/vichan-devel/vichan/issues/327
 		//
@@ -79,7 +90,10 @@ export default class FourChan extends Engine {
 				// Not including the "opening comment".
 				thread.commentsCount = comments.length - 1
 			}
-			thread.attachmentsCount = comments.reduce((sum, comment) => sum += comment.attachments ? comment.attachments.length : 0, 0)
+			thread.attachmentsCount = comments.reduce(
+				(sum, comment) => sum += comment.attachments ? comment.attachments.length : 0,
+				0
+			)
 		}
 		return Thread(
 			thread,
