@@ -45,7 +45,7 @@ const API_RESPONSE = {
 
 const RESULT = {
   "id": 14298,
-  "commentsCount": 0,
+  "commentsCount": 1,
   "attachmentsCount": 0,
   "updatedAt": new Date("2020-01-13T21:02:17.000Z"),
   "boardId": "λ",

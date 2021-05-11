@@ -1,3 +1,8 @@
+0.4.38 / xx.05.2021
+==================
+
+* `commentsCount` and `attachmentsCount` now include the "original" ("opening" / "main") comment of a thread.
+
 0.4.37 / 04.05.2021
 ==================
 

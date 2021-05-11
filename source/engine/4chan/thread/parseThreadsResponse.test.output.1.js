@@ -5,8 +5,8 @@ export default [
 		"title": "/stg/- Slave Trainer General/Maledom general",
 		"createdAt": new Date("2019-02-01T06:37:01.000Z"),
 		"updatedAt": new Date(1549225356 * 1000),
-		"commentsCount": 193,
-		"attachmentsCount": 37,
+		"commentsCount": 194,
+		"attachmentsCount": 36,
 		"comments" : [
 			{
 				"id": 2952650,

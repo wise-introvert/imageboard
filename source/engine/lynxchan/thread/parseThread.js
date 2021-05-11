@@ -52,13 +52,13 @@ function getCommentsCount(postCount, posts) {
 	// even when there're no replies, `posts` is `[]`.
 	// so `if (posts)` means `if ("get thread" API response)`.
 	if (posts) {
-		return posts.length
+		return posts.length + 1
 	}
 	// Uses a workaround for a `lynxchan` bug:
 	// `lynxchan` doesn't return `postCount`
 	// in `/catalog.json` API response
 	// if there're no replies in a thread.
-	return postCount || 0
+	return (postCount || 0) + 1
 }
 
 function getAttachmentsCount(fileCount, posts, files) {

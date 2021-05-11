@@ -22,7 +22,7 @@ export default function parseThreadsResponse(response) {
 		}) => {
 			const thread = {
 				id: parseInt(num),
-				commentsCount: posts_count,
+				commentsCount: posts_count + 1,
 				// `files_count` doesn't include the "opening comment"'s attachments in this case.
 				// `files_count` is incorrect anyway:
 				// https://gitlab.com/catamphetamine/imageboard/blob/master/docs/engines/makaba-issues.md

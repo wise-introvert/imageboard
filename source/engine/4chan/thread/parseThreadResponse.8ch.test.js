@@ -64,7 +64,7 @@ const RESULT = {
   "id": 2942,
   "isSticky": 1,
   "isRolling": true,
-  "commentsCount": 2,
+  "commentsCount": 3,
   "attachmentsCount": 0,
   "updatedAt": new Date("2020-01-06T08:17:54.000Z"),
   "boardId": "pnd",

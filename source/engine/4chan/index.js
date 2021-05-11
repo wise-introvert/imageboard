@@ -87,8 +87,7 @@ export default class FourChan extends Engine {
 		//
 		if (this.options.engine === 'OpenIB' || this.options.engine === 'vichan') {
 			if (thread.commentsCount === undefined) {
-				// Not including the "opening comment".
-				thread.commentsCount = comments.length - 1
+				thread.commentsCount = comments.length
 			}
 			thread.attachmentsCount = comments.reduce(
 				(sum, comment) => sum += comment.attachments ? comment.attachments.length : 0,

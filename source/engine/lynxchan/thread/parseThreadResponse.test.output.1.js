@@ -98,6 +98,6 @@ export default {
       ]
     }
   ],
-  commentsCount: 2,
+  commentsCount: 3,
   attachmentsCount: 3
 }

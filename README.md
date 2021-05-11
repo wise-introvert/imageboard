@@ -475,7 +475,7 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // Example: "b".
   boardId: string,
   // Comments count in this thread.
-  // (not including the main comment of the thread).
+  // (including the main comment of the thread).
   commentsCount: number,
   // Attachments count in this thread.
   // (including the attachments of the main comment of the thread).

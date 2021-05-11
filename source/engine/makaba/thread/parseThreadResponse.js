@@ -15,7 +15,7 @@ export default function parseThreadResponse(response) {
 	const openingPost = response.threads[0].posts[0]
 	const thread = {
 		id: parseInt(current_thread),
-		commentsCount: posts_count,
+		commentsCount: posts_count + 1,
 		// `unique_posters` is only present in "get thread comments" API response.
 		// For some weird reason doesn't include the "opening comment" of a thread.
 		// In other words, `unique_posters` won't count thread author unless

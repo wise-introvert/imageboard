@@ -8,6 +8,10 @@ export default function parseThread({
 	no,
 	replies,
 	images,
+	// Attachment file extension.
+	ext,
+	// In case of more than a single attachment (8ch, vichan).
+	extra_files,
 	last_replies,
 	omitted_images,
 	closed,
@@ -27,25 +31,44 @@ export default function parseThread({
 		// `no` is present in "get threads list" API response.
 		id: no,
 		isSticky: sticky,
+		//
 		// `4chan.org` has `closed` property.
 		// `8ch.net` has `locked` property.
 		isLocked: closed || locked,
+		//
 		// `8ch.net` has `cyclical="0"` property.
 		// I guess it's for "rolling" threads.
 		// Seems that it's always "0" though.
 		// Weird that it's a string rather than a number
 		// like it is for `sticky` or `locked`.
 		isRolling: cyclical === '1',
-		// Not including the "opening comment".
-		// `vichan` and `OpenIB` don't have `replies` property
-		// in "get thread comments" API response.
-		commentsCount: replies === undefined ? undefined : replies,
-		// On `4chan.org`, `8ch.net` (OpenIB) and `vichan` chans
-		// the `images` counter doesn't include the attachments
-		// of the "opening post". Therefore, `1` is added.
-		// `vichan` and `OpenIB` don't have `images` property
-		// in "get thread comments" API response.
-		attachmentsCount: images === undefined ? undefined : images + 1
+		//
+		// `4chan`, `OpenIB` and `vichan` have `replies` property.
+		// `vichan` has `replies` property
+		// in "get threads list on a board" API response,
+		// but not in "get thread comments" API response.
+		// If `replies` property is present, use it to calculate `commentsCount`.
+		commentsCount: replies === undefined ? undefined : replies + 1,
+		//
+		// `4chan`, `OpenIB` and `vichan` have `images` property.
+		// `vichan` has `images` property
+		// in "get threads list on a board" API response,
+		// but not in "get thread comments" API response.
+		// If `images` property is present, use it to calculate `attachmentsCount`.
+		//
+		// The `images` property doesn't include the attachments
+		// of the "opening comment". Therefore, the count of attachments
+		// of the "opening comment" should be added.
+		// On `4chan.org`, there can only be a single attachment in a comment.
+		// `vichan` and `OpenIB` support several attachments in a comment.
+		//
+		attachmentsCount: getAttachmentsCount({
+			images,
+			omitted_images,
+			ext,
+			extra_files,
+			cyclical
+		})
 	}
 	// Is present only in "get thread comments" API response.
 	if (unique_ips) {
@@ -90,4 +113,25 @@ export default function parseThread({
 		thread.customSpoilersCount = custom_spoiler
 	}
 	return thread
+}
+
+function getAttachmentsCount({
+	images,
+	omitted_images,
+	ext,
+	extra_files,
+	cyclical
+}) {
+	// `4chan` doesn't have `cyclical` property.
+	if (!cyclical) {
+		return images
+	}
+	// `8ch` (`OpenIB`) and `vichan` have incorrect `images` property.
+	// `vichan` has `images` property in "/catalog.json" API response,
+	// which is incorrect, and doesn't have that property in
+	// "get thread comments" API response.
+	// `OpenIB` has `images` property both in "/catalog.json" API response
+	// and in "get thread comments" API response, but that `images` property
+	// is also incorrect, so it should be ignored.
+	return omitted_images + (ext ? 1 + (extra_files ? extra_files.length : 0) : 0)
 }

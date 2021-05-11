@@ -1,7 +1,7 @@
 export default [{
 	id: 297,
 	boardId: "a",
-	commentsCount: 181,
+	commentsCount: 182,
 	attachmentsCount: 162,
 	title: "Gemeinsames Animuschauen",
 	isSticky: true,
