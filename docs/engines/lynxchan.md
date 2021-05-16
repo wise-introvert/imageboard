@@ -10,6 +10,10 @@ The APIs provided by the engine are:
 
 This document describes a subset of its API that could be relevant for this library. Refer to the official documentation linked above for the latest and full info.
 
+Or, refer to `lynxchan` [source codes](https://gitgud.io/LynxChan/LynxChan/-/tree/master/src/be/form) to get the full details on the API.
+
+Also, there's `KohlNumbra` client [source code](https://gitgud.io/Tjark/KohlNumbra/blob/master/static/js/api.js) that could be used as a reference.
+
 ## Input format
 
 `POST` methods accept [`FormData`](developer.mozilla.org/docs/Web/API/FormData/FormData) as an input and return a response in `JSON` format if `?json=1` URL parameter is passed (otherwise, they return a HTML response page).
