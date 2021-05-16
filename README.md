@@ -1040,6 +1040,21 @@ There're some very minor limitations for `8ch.net (8kun.top)` caused by its `Ope
 
 There're [some very minor bugs](https://gitlab.com/catamphetamine/imageboard/blob/master/docs/engines/makaba-issues.md) for `2ch.hk` caused by its `makaba` engine.
 
+## Testing
+
+Unit tests:
+
+```
+npm test
+```
+
+Real-world tests:
+
+```
+npm run build
+node test/test
+```
+
 ## GitHub
 
 On March 9th, 2020, GitHub, Inc. silently [banned](https://medium.com/@catamphetamine/how-github-blocked-me-and-all-my-libraries-c32c61f061d3) my account (erasing all my repos, issues and comments) without any notice or explanation. Because of that, all source codes had to be promptly moved to GitLab. The [GitHub repo](https://github.com/catamphetamine/imageboard) is now only used as a backup (you can star the repo there too), and the primary repo is now the [GitLab one](https://gitlab.com/catamphetamine/imageboard). Issues can be reported in any repo.
