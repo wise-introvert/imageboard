@@ -1,6 +1,7 @@
 import Engine from '../../Engine'
 
 import parseBoardsResponse from './board/parseBoardsResponse'
+import parseBoardsPageResponse from './board/parseBoardsPageResponse'
 import parseThreadsResponse from './thread/parseThreadsResponse'
 import parseThreadsPageResponse from './thread/parseThreadsPageResponse'
 import parseThreadResponse from './thread/parseThreadResponse'
@@ -29,6 +30,20 @@ export default class LynxChan extends Engine {
 	 */
 	parseBoards(response, options) {
 		return parseBoardsResponse(response, options).map(Board)
+	}
+
+	/**
+	 * Parses "get boards list page" API response.
+	 * @param  {any} response
+	 * @param  {object} [options]
+	 * @return {object} An object of shape `{ boards: Board[], pageCount }`.
+	 */
+	parseBoardsPage(response, options) {
+		const { boards, pageCount } = parseBoardsPageResponse(response, this.getOptions(options))
+		return {
+			boards: boards.map(Board),
+			pageCount
+		}
 	}
 
 	/**

@@ -116,22 +116,67 @@ export default class Engine {
 		if (this.options.boards) {
 			return this.options.boards
 		}
-		// The API endpoint URL.
-		const url = options.all ?
-			this.options.api.getAllBoards || this.options.api.getBoards :
-			this.options.api.getBoards
-		// Validate configuration.
-		if (!url) {
-			throw new Error('Neither "boards" nor "api.getBoards" parameters were found in chan config')
-		}
-		// Query the API endpoint.
-		const response = await this.request('GET', this.toAbsoluteUrl(url), {
-			headers: {
-				'Accept': 'application/json'
+
+		const { boardCategories } = this.options
+
+		// Get the API endpoint URL.
+
+		const {
+			getAllBoards,
+			getBoards,
+			getBoardsPage
+		} = this.options.api
+
+		let url
+		let page
+
+		if (options.all) {
+			if (getAllBoards) {
+				url = getAllBoards
+			} else if (getBoardsPage) {
+				url = getBoardsPage
+				page = 1
 			}
-		})
-		// Parse the boards list.
-		return this.parseBoards(response, options)
+		} else {
+			if (getBoards) {
+				url = getBoards
+			} else if (getBoardsPage) {
+				url = getBoardsPage
+				page = 1
+			}
+		}
+
+		// Validate URL.
+		if (!url) {
+			throw new Error('Couldn\'t determine the boards list URL')
+		}
+
+		// Query the API.
+		const fetch = async (url) => {
+			return await this.request('GET', this.toAbsoluteUrl(url), {
+				headers: {
+					'Accept': 'application/json'
+				}
+			})
+		}
+
+		// If no pagination is used, return the list of boards.
+		if (!page) {
+			const response = await fetch(url)
+			return this.parseBoards(response, options)
+		}
+
+		// Iterate through boards list pages.
+		let response = await fetch(url.replace('{page}', page))
+		let { boards, pageCount } = this.parseBoardsPage(response, options)
+		while (page < pageCount) {
+			page++
+			response = await fetch(url.replace('{page}', page))
+			const { boards: nextBoards } = this.parseBoardsPage(response, options)
+			boards = boards.concat(nextBoards)
+		}
+
+		return boards
 	}
 
 	/**
