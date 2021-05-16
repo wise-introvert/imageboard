@@ -11,8 +11,12 @@ Contains both the comment and the attachment file info.
 	// Post ID.
 	"no": 184187118,
 
-	// Post creation date (Unix timestamp).
+	// Post creation date (Unix timestamp; in seconds).
 	"time": 1549182611,
+
+	// Post creation date (in milliseconds).
+	// Same as `time` but in milliseconds rather than seconds.
+	"tim": 1549182611000,
 
 	// Post creation date (text).
 	"now": "02/03/19(Sun)03:30:11",
@@ -213,10 +217,8 @@ Consists of the "opening post" (thread ID is the "opening post" ID) and some thr
 	// For example, if there're 3 posts total in a thread
 	// (the first being the main post and the two other being "comments")
 	// then `last_replies` can contain just the last post (no logic).
-	// May be absent.
-	"last_replies": [
-		// A list of `Post` objects
-	]
+	// Will be absent if there're no replies.
+	"last_replies": Post[],
 
 	// (only for `/thread/THREAD-ID.json` API response)
 	// Unique poster IPs count.
@@ -411,6 +413,20 @@ Message HTML syntax is:
 	...
 ]
 ```
+
+### Get threads page
+
+For the first page:
+
+[https://a.4cdn.org/a/1.json](https://a.4cdn.org/a/1.json)
+
+```js
+{
+	"threads": Thread[]
+}
+```
+
+I don't know what for does this API endpoint exist. Fetching any "next" page after the first one would result in an incorrect threads list because by that time the first page has already changed.
 
 ### Get thread IDs list (and their latest comment dates)
 

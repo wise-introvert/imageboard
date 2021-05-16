@@ -14,7 +14,7 @@ const MAILTO = /^mailto:/
  * Parses response thread JSON object.
  * @param  {object} thread — Response thread JSON object.
  * @param  {object} options
- * @param  {object} data
+ * @param  {object} parameters.board
  * @return {object} See README.md for "Comment" object description.
  */
 export default function parseComment(post, {
@@ -23,10 +23,12 @@ export default function parseComment(post, {
 	transformAttachmentUrl,
 	tripcode
 }, {
-	defaultAuthorName,
-	hasVoting,
-	hasFlags,
-	badges
+	board: {
+		defaultAuthorName,
+		hasVoting,
+		hasFlags,
+		badges
+	}
 }) {
 	// `post.comment` is always present, even when there's no text.
 	// Whitespace-only `post.comment` is not trimmed by the engine.

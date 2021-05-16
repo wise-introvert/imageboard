@@ -2,6 +2,7 @@ import Engine from '../../Engine'
 
 import parseBoardsResponse from './board/parseBoardsResponse'
 import parseThreadsResponse from './thread/parseThreadsResponse'
+import parseThreadsPageResponse from './thread/parseThreadsPageResponse'
 import parseThreadResponse from './thread/parseThreadResponse'
 import parseComment from './comment/parseComment'
 
@@ -37,15 +38,19 @@ export default class LynxChan extends Engine {
 	 * @return {Thread[]}
 	 */
 	parseThreads(response, options) {
-		const {
-			threads,
-			comments
-		} = parseThreadsResponse(response)
-		return threads.map((thread, i) => Thread(
-			thread,
-			[this.parseComment(comments[i], { ...options, threadId: thread.id })],
-			this.getOptions(options)
-		))
+		const { threads } = parseThreadsResponse(response)
+		return threads.map(thread => this.createThreadObject(thread, options))
+	}
+
+	/**
+	 * Parses "get threads list" page API response.
+	 * @param  {any} response
+	 * @param  {object} [options]
+	 * @return {Thread[]}
+	 */
+	parseThreadsPage(response, options) {
+		const { board, threads } = parseThreadsPageResponse(response)
+		return threads.map((thread) => this.createThreadObject(thread, options, { board }))
 	}
 
 	/**
@@ -55,28 +60,19 @@ export default class LynxChan extends Engine {
 	 * @return {Thread}
 	 */
 	parseThread(response, options) {
-		const {
-			thread,
-			comments,
-			board
-		} = parseThreadResponse(response)
-		return Thread(
-			thread,
-			comments.map(comment => this.parseComment(comment, { ...options, threadId: thread.id })),
-			this.getOptions(options),
-			board
-		)
+		const { board, thread } = parseThreadResponse(response)
+		return this.createThreadObject(thread, options, { board })
 	}
 
 	/**
-	 * Creates a `Comment` from comment data.
+	 * Parses comment data.
 	 * @param  {object} comment
 	 * @param  {object} options
-	 * @return {Comment}
+	 * @param  {object} parameters.thread
+	 * @return {object}
 	 */
-	parseComment(comment, options) {
-		options = this.getOptions(options)
-		return Comment(parseComment(comment, options), options)
+	_parseComment(comment, options, { thread }) {
+		return parseComment(comment, options, { thread })
 	}
 }
 

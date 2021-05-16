@@ -17,7 +17,12 @@ function parseCommentTest(comment, options, expected, expectedWarnings = []) {
 			files: [],
 			...comment
 		},
-		options
+		options,
+		{
+			thread: {
+				id: comment.postId
+			}
+		}
 	)
 
 	if (!attachmentsAreBeingTested) {

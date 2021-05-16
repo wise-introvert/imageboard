@@ -8,15 +8,27 @@ import visitPostParts from 'social-components/commonjs/utility/post/visitPostPar
  * @param {func} options.getCommentById
  * @param {number} options.threadId
  */
-export default function classifyPostLinks(content, { getCommentById, threadId }) {
+export default function classifyPostLinks(content, {
+	getCommentById,
+	threadId,
+	markDeletedPosts
+}) {
 	visitPostParts(
 		'post-link',
-		postLink => classifyPostLink(postLink, { getCommentById, threadId }),
+		postLink => classifyPostLink(postLink, {
+			getCommentById,
+			threadId,
+			markDeletedPosts
+		}),
 		content
 	)
 }
 
-function classifyPostLink(postLink, { getCommentById, threadId }) {
+function classifyPostLink(postLink, {
+	getCommentById,
+	threadId,
+	markDeletedPosts
+}) {
 	// Get the post being quoted.
 	// `Array.find()` is slow for doing it every time.
 	// A "postsById" index is much faster.
@@ -31,7 +43,9 @@ function classifyPostLink(postLink, { getCommentById, threadId }) {
 	}
 	// If the quoted post has been deleted then skip it.
 	else if (!quotedPost) {
-		postLink.postWasDeleted = true
+		if (markDeletedPosts) {
+			postLink.postWasDeleted = true
+		}
 	}
 	// If the quoted post is hidden then don't add a quote it a link to it.
 	else if (quotedPost.hidden) {

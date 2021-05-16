@@ -22,6 +22,7 @@ import setPostLinksDefaultText from './setPostLinksDefaultText'
 export function generatePostLinksAndUpdatePreview(comment, {
 	threadId,
 	getCommentById,
+	markDeletedPosts,
 	messages,
 	generatedQuoteMaxLength,
 	generatedQuoteMinFitFactor,
@@ -37,7 +38,7 @@ export function generatePostLinksAndUpdatePreview(comment, {
 	if (!hasBeenCalledBefore) {
 		// `classifyPostLinks()` must precede `setPostLinkQuotes()`,
 		// because it sets `postWasDeleted: true` flags for deleted comments.
-		classifyPostLinks(content, { getCommentById, threadId })
+		classifyPostLinks(content, { getCommentById, threadId, markDeletedPosts })
 		if (messages) {
 			// `setPostLinksDefaultText()` must come after `classifyPostLinks()`.
 			// Set "Deleted comment" `content` for links to deleted comments.
@@ -93,6 +94,7 @@ export function addParseContent(comment, {
 	boardId,
 	threadId,
 	getCommentById: originalGetCommentById,
+	markDeletedPosts,
 	messages,
 	generatedQuoteMaxLength,
 	generatedQuoteMinFitFactor,
@@ -122,6 +124,7 @@ export function addParseContent(comment, {
 		// Autogenerate "in reply to" quotes for links to all other comments.
 		return generatePostLinksAndUpdatePreview(comment, {
 			getCommentById: getCommentById || originalGetCommentById,
+			markDeletedPosts,
 			threadId,
 			messages,
 			generatedQuoteMaxLength,

@@ -12,7 +12,6 @@ export default function parseThread({
 	ext,
 	// In case of more than a single attachment (8ch, vichan).
 	extra_files,
-	last_replies,
 	omitted_images,
 	closed,
 	locked,
@@ -25,8 +24,11 @@ export default function parseThread({
 	imagelimit,
 	archived,
 	archived_on,
-	custom_spoiler
-}) {
+	custom_spoiler,
+	...rest
+}, {
+	last_replies
+} = {}) {
 	const thread = {
 		// `no` is present in "get threads list" API response.
 		id: no,
@@ -36,7 +38,7 @@ export default function parseThread({
 		// `8ch.net` has `locked` property.
 		isLocked: closed || locked,
 		//
-		// `8ch.net` has `cyclical="0"` property.
+		// `vichan` and `OpenIB` have `cyclical="0"` property.
 		// I guess it's for "rolling" threads.
 		// Seems that it's always "0" though.
 		// Weird that it's a string rather than a number
@@ -81,8 +83,9 @@ export default function parseThread({
 	}
 	// `8ch.net` has a concept of "bumplocked" threads that are in "autosage" mode.
 	// https://twitter.com/infinitechan/status/555013038839848961
-	// In other words, "bumplocked" threads are never bumped.
-	// I guess it can be set both when a thread is created and later too.
+	// In other words, "bumplocked" threads never get bumped,
+	// even when someone leaves a comment.
+	// I guess it can be set both at thread creation time or some time after.
 	// Weird that it's a string rather than a number
 	// like it is for `sticky` or `locked`.
 	if (bumplocked === '1') {
@@ -111,6 +114,15 @@ export default function parseThread({
 	// https://github.com/4chan/4chan-API
 	if (custom_spoiler) {
 		thread.customSpoilersCount = custom_spoiler
+	}
+	thread.comments = [{
+		no,
+		ext,
+		extra_files,
+		...rest
+	}]
+	if (last_replies) {
+		thread.comments = thread.comments.concat(last_replies)
 	}
 	return thread
 }

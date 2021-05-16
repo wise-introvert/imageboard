@@ -47,6 +47,7 @@
 	"api": {
 		"getThread": "/{boardId}/res/{threadId}.json",
 		"getThreads": "/{boardId}/catalog.json",
+		"getThreadsWithLatestCommentsPage": "/{boardId}/{pageIndex}.json",
 		"getBoards": "/boards-top20.json",
 		"getAllBoards": "/boards.json"
 	}

@@ -2,8 +2,11 @@ import Engine from '../../Engine'
 
 import parseBoardsResponse from './board/parseBoardsResponse'
 import parseThreadsResponse from './thread/parseThreadsResponse'
+import parseThreadsPageResponse from './thread/parseThreadsPageResponse'
 import parseThreadResponse from './thread/parseThreadResponse'
 import parseComment from './comment/parseComment'
+import parsePostResponse from './post/parsePostResponse'
+import parseReportResponse from './report/parseReportResponse'
 
 import Board from '../../Board'
 import Thread from '../../Thread'
@@ -39,15 +42,19 @@ export default class FourChan extends Engine {
 	 * @return {Thread[]}
 	 */
 	parseThreads(response, options) {
-		const {
-			threads,
-			comments
-		} = parseThreadsResponse(response)
-		return threads.map((thread, i) => Thread(
-			thread,
-			[this.parseComment(comments[i], options)],
-			this.getOptions(options)
-		))
+		const { threads } = parseThreadsResponse(response, options)
+		return threads.map(thread => this.createThreadObject(thread, options))
+	}
+
+	/**
+	 * Parses "get threads list" page API response.
+	 * @param  {any} response
+	 * @param  {object} [options]
+	 * @return {Thread[]}
+	 */
+	parseThreadsPage(response, options) {
+		const { threads } = parseThreadsPageResponse(response)
+		return threads.map(thread => this.createThreadObject(thread, options))
 	}
 
 	/**
@@ -57,10 +64,7 @@ export default class FourChan extends Engine {
 	 * @return {Thread}
 	 */
 	parseThread(response, options) {
-		const {
-			thread,
-			comments
-		} = parseThreadResponse(response)
+		const { thread } = parseThreadResponse(response)
 		// Fix incorrect attachments count for certain engines.
 		//
 		// `8ch.net` returns incorrect `images` count:
@@ -87,29 +91,41 @@ export default class FourChan extends Engine {
 		//
 		if (this.options.engine === 'OpenIB' || this.options.engine === 'vichan') {
 			if (thread.commentsCount === undefined) {
-				thread.commentsCount = comments.length
+				thread.commentsCount = thread.comments.length
 			}
-			thread.attachmentsCount = comments.reduce(
+			thread.attachmentsCount = thread.comments.reduce(
 				(sum, comment) => sum += comment.attachments ? comment.attachments.length : 0,
 				0
 			)
 		}
-		return Thread(
-			thread,
-			comments.map(comment => this.parseComment(comment, options)),
-			this.getOptions(options)
-		)
+		return this.createThreadObject(thread)
 	}
 
 	/**
-	 * Creates a `Comment` from comment data.
+	 * Parses comment data.
 	 * @param  {object} comment
 	 * @param  {object} options
-	 * @return {Comment}
+	 * @return {object}
 	 */
-	parseComment(comment, options) {
-		options = this.getOptions(options)
-		return Comment(parseComment(comment, options), options)
+	_parseComment(comment, options) {
+		return parseComment(comment, options)
+	}
+
+	/**
+	 * Parses "post" API response.
+	 * @param  {object} response
+	 * @return {number} Returns new thread ID or new comment ID.
+	 */
+	parsePostResponse(response) {
+		return parsePostResponse(response)
+	}
+
+	/**
+	 * Parses "report" API response.
+	 * @param  {object} response
+	 */
+	parseReportResponse(response) {
+		return parseReportResponse(response)
 	}
 }
 

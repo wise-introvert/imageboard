@@ -14,13 +14,16 @@ import parseAttachments from './parseAttachments'
 export default function parseComment(post, {
 	chan,
 	boardId,
-	threadId,
 	attachmentUrl,
 	attachmentThumbnailUrl,
 	thumbnailSize,
 	toAbsoluteUrl,
 	defaultAuthorName,
 	capcode
+}, {
+	thread: {
+		id: threadId
+	}
 }) {
 	// Fixes LynxChan new line characters.
 	// `post.markdown` is not really "markdown", it's HTML.

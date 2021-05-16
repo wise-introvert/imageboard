@@ -13,6 +13,8 @@
 		"getThread": "/{boardId}/res/{threadId}.json",
 		"getArchivedThread": "/{boardId}/arch/res/{threadId}.json",
 		"getThreads": "/{boardId}/catalog.json",
+		"getThreadsWithLatestCommentsFirstPage": "/{boardId}/index.json",
+		"getThreadsWithLatestCommentsPage": "/{boardId}/{pageIndex}.json",
 		"getBoards": "/boards.json",
 		"vote": {
 			"method": "GET",

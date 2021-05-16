@@ -8,7 +8,7 @@ function parseCommentTest(comment, options, expected, expectedWarnings = []) {
 	const warnings = []
 	console.warn = (text) => warnings.push(text)
 
-	comment = TwoChan({}).parseComment(comment, options, {})
+	comment = TwoChan({}).parseComment(comment, options, { board: {} })
 
 	console.warn = consoleWarn
 

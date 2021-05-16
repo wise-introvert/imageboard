@@ -1,7 +1,13 @@
-0.4.38 / xx.05.2021
+0.4.38 / 16.05.2021
 ==================
 
 * `commentsCount` and `attachmentsCount` now include the "original" ("opening" / "main") comment of a thread.
+
+* Added `withLatestComments` and `maxLatestCommentsPages` options to `getThreads()`.
+
+* Added a "get boards list" API method on `lynxchan`.
+
+* Added `lynxchan` API description.
 
 0.4.37 / 04.05.2021
 ==================

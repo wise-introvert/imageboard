@@ -25,6 +25,7 @@
 	"api": {
 		"getThread": "https://a.4cdn.org/{boardId}/thread/{threadId}.json",
 		"getThreads": "https://a.4cdn.org/{boardId}/catalog.json",
+		"getThreadsWithLatestComments": "https://a.4cdn.org/{boardId}/catalog.json",
 		"getBoards": "https://a.4cdn.org/boards.json",
 		"post": {
 			"method": "POST",

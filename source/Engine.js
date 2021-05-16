@@ -1,5 +1,8 @@
 import parseAndFormatCommentContent from './parseAndFormatCommentContent'
 
+import Thread from './Thread'
+import Comment from './Comment'
+
 import convertDateToUtc0 from './utility/convertDateToUtc0'
 import joinPath from './utility/joinPath'
 import { getParameters, setParameters, addQueryParameters } from './utility/parameters'
@@ -179,21 +182,150 @@ export default class Engine {
 	 * @param  {object} [options] — See the README.
 	 * @return {object[]} — A list of `Thread` objects.
 	 */
-	async getThreads(parameters, options) {
+	async getThreads(parameters, {
+		withLatestComments,
+		maxLatestCommentsPages,
+		...restOptions
+	} = {}) {
+		const {
+			getThreads: getThreadsUrl,
+			getThreadsWithLatestComments: getThreadsWithLatestCommentsUrl,
+			getThreadsWithLatestCommentsFirstPage: getThreadsWithLatestCommentsFirstPageUrl,
+			getThreadsWithLatestCommentsPage: getThreadsWithLatestCommentsPageUrl
+		} = this.options.api
+
 		// The API endpoint URL.
-		const url = setParameters(this.options.api.getThreads, parameters)
-		// Query the API endpoint.
-		const response = await this.request('GET', this.toAbsoluteUrl(url), {
-			headers: {
-				'Accept': 'application/json'
+		let url = getThreadsUrl
+		let fetchPages
+		if (withLatestComments) {
+			if (getThreadsWithLatestCommentsUrl) {
+				url = getThreadsWithLatestCommentsUrl
+			} else if (getThreadsWithLatestCommentsPageUrl) {
+				fetchPages = true
 			}
-		})
-		// Parse the threads list.
-		// `boardId` is still used there.
-		return this.parseThreads(response, {
+		}
+
+		// Fetches data from a URL.
+		const fetch = (url) => {
+			// Set API endpoint URL parameters (like `{boardId}`).
+			url = setParameters(url, parameters)
+			return this.request('GET', this.toAbsoluteUrl(url), {
+				headers: {
+					Accept: 'application/json'
+				}
+			})
+		}
+
+		// Fetch the data from the `/catalog.json` API endpoint.
+		const promises = [fetch(url)]
+
+		// Optionally fetch threads list pages.
+		if (fetchPages) {
+			const maxPagesToFetch = maxLatestCommentsPages === undefined ? MAX_LATEST_COMMENTS_PAGES_TO_FETCH : maxLatestCommentsPages
+			let i = 0
+			while (i < maxPagesToFetch) {
+				let pageUrl = getThreadsWithLatestCommentsPageUrl
+					.replace('{pageIndex}', i)
+					.replace('{page}', i + 1)
+				if (i === 0 && getThreadsWithLatestCommentsFirstPageUrl) {
+					pageUrl = getThreadsWithLatestCommentsFirstPageUrl
+				}
+				promises.push(fetch(pageUrl))
+				i++
+			}
+		}
+
+		// Wait until it fetches the data from `/catalog.json`,
+		// along with the optional threads list pages.
+		const [response, ...pageResponses] = await Promise.allSettled(promises)
+
+		// If even the `/catalog.json` request didn't succeed, then throw an error.
+		if (response.status === 'rejected') {
+			throw response.reason
+		}
+
+		// Parse the threads list from `/catalog.json` response.
+		const fullThreadsList = this.parseThreads(response.value, {
 			...parameters,
-			...options
+			...restOptions,
+			withLatestComments
 		})
+
+		// Parse the optional threads list pages.
+		const threadsPages = []
+		for (const pageResponse of pageResponses) {
+			// As soon as any threads list page returns an error,
+			// don't look at further threads list pages.
+			// This makes it easy to "overestimate" the possible
+			// threads list pages count because it's not known
+			// beforehand. Sometimes, it could be known, but only
+			// via a separate HTTP query, which would result in
+			// additional latency, which is not the best UX.
+			if (pageResponse.status === 'rejected') {
+				break
+			}
+			// Parse threads list page.
+			const threadsPage = this.parseThreadsPage(pageResponse.value, {
+				...parameters,
+				...restOptions,
+				withLatestComments
+			})
+			// Add threads list page.
+			threadsPages.push(threadsPage)
+		}
+
+		// If no threads list pages have been loaded,
+		// then simply return the result from `/catalog.json`.
+		if (threadsPages.length === 0) {
+			return fullThreadsList
+		}
+
+		// First page will be treated in a special way
+		// compared to the rest of the pages.
+		const [firstPage, ...restPages] = threadsPages
+
+		// `firstPage` list will be used for lookup, so don't "mutate" it.
+		// The "full threads list" starts from the first threads page.
+		const threads = firstPage.slice()
+
+		// For all threads from `/catalog.json` response,
+		// add them to the first page of the threads list
+		// while skipping duplicates.
+		// This way, it's gonna be the same complete list
+		// as in case of a `/catalog.json` response, but
+		// also with "latest comments" for the first page.
+		for (const thread of fullThreadsList) {
+			if (!firstPage.find(_ => _.id === thread.id)) {
+				threads.push(thread)
+			}
+		}
+
+		// For all the rest of the pages, for every thread on a page,
+		// update its data in the full list of threads.
+		// Such thread data has "latest comments", and if any threads
+		// aren't present on those pages, they simply won't be updated
+		// with their "latest comments" data, and they'll still be present
+		// in the full list of threads.
+		// The (chronological) order of all threads is preserved.
+		for (const threadsPage of restPages) {
+			for (const thread of threadsPage) {
+				const existingThreadIndex = threads.findIndex(_ => _.id === thread.id)
+				if (existingThreadIndex >= 0) {
+					threads[existingThreadIndex] = thread
+				}
+			}
+		}
+
+		// Fix `lynxchan` bug when there's no `attachmentsCount` info
+		// in threads list page data, so get it from the `/catalog.json` API response.
+		if (this.options.engine === 'lynxchan') {
+			for (const thread of threads) {
+				const threadFromCatalog = fullThreadsList.find(_ => _.id === thread.id)
+				thread.attachmentsCount = threadFromCatalog.attachmentsCount
+			}
+		}
+
+		return threads
 	}
 
 	/**
@@ -377,6 +509,37 @@ export default class Engine {
 	}
 
 	/**
+	 * Creates a Thread object from thread data.
+	 * @param  {object} thread
+	 * @param  {object} [options]
+	 * @param  {object} [parameters.board]
+	 * @return {Thread}
+	 */
+	createThreadObject(thread, options, { board } = {}) {
+		thread.comments = thread.comments.map(
+			comment => this.parseComment(comment, options, { board, thread })
+		)
+		return Thread(
+			thread,
+			this.getOptions(options),
+			{ board }
+		)
+	}
+
+	/**
+	 * Creates a `Comment` from comment data.
+	 * @param  {object} comment
+	 * @param  {object} options
+	 * @param  {object} parameters.board
+	 * @param  {object} parameters.thread
+	 * @return {Comment}
+	 */
+	parseComment(comment, options, { board, thread } = {}) {
+		options = this.getOptions(options)
+		return Comment(this._parseComment(comment, options, { board, thread }), options)
+	}
+
+	/**
 	 * Can be used when `parseContent: false` option is passed.
 	 * @param {object} comment
 	 * @param {object} [options] — `{ threadId }` if `threadId` isn't already part of `this.options`.
@@ -398,3 +561,5 @@ export default class Engine {
 function isJson(response) {
 	return Array.isArray(response) || typeof response === 'object'
 }
+
+const MAX_LATEST_COMMENTS_PAGES_TO_FETCH = 1

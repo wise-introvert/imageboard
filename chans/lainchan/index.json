@@ -12,7 +12,8 @@
   "commentUrl": "/{boardId}/res/{threadId}.html#{commentId}",
 	"api": {
 		"getThread": "/{boardId}/res/{threadId}.json",
-		"getThreads": "/{boardId}/catalog.json"
+		"getThreads": "/{boardId}/catalog.json",
+		"getThreadsWithLatestCommentsPage": "/{boardId}/{pageIndex}.json"
 	},
 	"boards": [
 		{

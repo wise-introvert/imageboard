@@ -6,7 +6,6 @@
  */
 export default function parseThread({
 	threadId,
-	subject,
 	locked,
 	pinned,
 	cyclic,
@@ -18,16 +17,19 @@ export default function parseThread({
 	postCount,
 	fileCount,
 	posts,
-	files
+	files,
+	ommitedPosts,
+	...rest
+}, {
+	mode
 }) {
 	const thread = {
 		id: threadId,
-		title: subject,
 		isLocked: locked,
 		isSticky: pinned,
 		isRolling: cyclic,
-		commentsCount: getCommentsCount(postCount, posts),
-		attachmentsCount: getAttachmentsCount(fileCount, posts, files)
+		commentsCount: getCommentsCount(postCount, posts, ommitedPosts, mode),
+		attachmentsCount: getAttachmentsCount(fileCount, posts, files, mode)
 	}
 	// LynxChan allows manually archiving a thread by an admin or a moderator.
 	if (archived) {
@@ -42,44 +44,89 @@ export default function parseThread({
 	if (lastBump) {
 		thread.updatedAt = new Date(lastBump)
 	}
+	thread.comments = [{
+		postId: threadId,
+		files,
+		...rest
+	}]
+	if (posts) {
+		thread.comments = thread.comments.concat(posts)
+	}
 	return thread
 }
 
-function getCommentsCount(postCount, posts) {
+function getCommentsCount(postCount, posts, ommitedPosts, mode) {
 	// `lynxchan` doesn't provide `postCount` in "get thread" API response.
 	// In `/catalog.json` reponse `posts` property is always non-present,
 	// while in "get thread" API response it seems to always be present:
 	// even when there're no replies, `posts` is `[]`.
-	// so `if (posts)` means `if ("get thread" API response)`.
-	if (posts) {
+	if (mode === 'thread') {
 		return posts.length + 1
+	}
+	// If `ommitedPosts` property is present then it's a threads list page.
+	// `ommitedPosts` property is incorrectly named.
+	// https://gitgud.io/LynxChan/LynxChan/-/issues/53
+	if (ommitedPosts !== undefined) {
+		return ommitedPosts + 1 + posts.length
 	}
 	// Uses a workaround for a `lynxchan` bug:
 	// `lynxchan` doesn't return `postCount`
 	// in `/catalog.json` API response
-	// if there're no replies in a thread.
+	// when there're no replies in a thread.
+	//
+	// There's no such bug on `kohlchan.net` though,
+	// because they patch those types of bugs themselves
+	// on top of the original `lynxchan` code.
+	//
 	return (postCount || 0) + 1
 }
 
-function getAttachmentsCount(fileCount, posts, files) {
+function getAttachmentsCount(fileCount, posts, files, mode) {
 	// `lynxchan` doesn't provide `fileCount` in "get thread" API response.
 	// In `/catalog.json` reponse `posts` property is always non-present,
 	// while in "get thread" API response it seems to always be present:
 	// even when there're no replies, `posts` is `[]`.
-	// so `if (posts)` means `if ("get thread" API response)`.
-	if (posts) {
+	if (mode === 'thread') {
 		return files.length + posts.reduce((sum, post) => sum + post.files.length, 0)
 	}
+
+	// There's no `ommitedFiles` property.
+	// https://gitgud.io/LynxChan/LynxChan/-/issues/53
+	// // If `ommitedFiles` property is present then it's a threads list page.
+	// // `ommitedFiles` property is incorrectly named.
+	// // https://gitgud.io/LynxChan/LynxChan/-/issues/53
+	// if (ommitedFiles !== undefined) {
+	// 	return ommitedFiles + files.length + posts.reduce((sum, post) => sum + post.files.length, 0)
+	// }
+
+	// On threads list page, there's no `fileCount` property at all,
+	// so the attachments count is unknown.
+	// Just return 0.
+	if (mode === 'threads-page') {
+		return 0
+	}
+
+	// There could be any number of attachments on the "opening comment":
+	// `lynxchan` doesn't provide that info in "/catalog.json" API response.
+	// The guess is `1`.
 	//
+	// On `kohlchan.net`, they provide the `files` array
+	// in `/catalog.json` API response.
+	// That's because they patch `lynxchan` themselves
+	// and fix such types of bugs.
+	//
+	const mainCommentAttachmentsCount = files ? files.length : 1
+
 	// Uses a workaround for a `lynxchan` bug:
 	// `lynxchan` doesn't return `fileCount`
 	// in `/catalog.json` API response
-	// if there're no attachments in thread's replies.
+	// when there're no replies in a thread.
+	//
+	// There's no such bug on `kohlchan.net` though,
+	// because they patch those types of bugs themselves
+	// on top of the original `lynxchan` code.
 	//
 	// `fileCount` doesn't include the "opening comment"'s attachments.
-	// There could be any number of attachments on the "opening comment":
-	// `lynxchan` doesn't provide that info in "get threads" API response.
-	// The guess is `1`.
 	//
-	return (fileCount || 0) + 1
+	return (fileCount || 0) + mainCommentAttachmentsCount
 }

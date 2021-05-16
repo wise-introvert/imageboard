@@ -4,7 +4,7 @@ import setReplies from './setReplies'
 import generateThreadTitle from './generateThreadTitle'
 import { generatePostLinksAndUpdatePreview, addParseContent } from './parseContent'
 
-export default function Thread(thread, comments, {
+export default function Thread(thread, {
 	boardId,
 	messages,
 	generatedQuoteMaxLength,
@@ -17,8 +17,9 @@ export default function Thread(thread, comments, {
 	expandReplies,
 	parseContent,
 	addParseContent: shouldAddParseContent,
-	parseCommentContent
-}, board) {
+	parseCommentContent,
+	withLatestComments
+}, { board }) {
 	thread.boardId = boardId
 	if (board) {
 		thread.board = board
@@ -50,10 +51,16 @@ export default function Thread(thread, comments, {
 	}
 	// `Array.find()` is slow for doing it every time.
 	// A "get post by id" index is much faster.
-	const getCommentById = createByIdIndex(comments)
+	const getCommentById = createByIdIndex(thread.comments)
+	// Whether it should mark absent comments as "Deleted".
+	// It should only do so if the list of comments is complete.
+	// In other words, only mark absent comments as "Deleted"
+	// when parsing "get thread comments" API response,
+	// not the "get threads list with latest comments" API response.
+	const markDeletedPosts = !withLatestComments
 	// Set `.inReplyTo` array for each comment.
 	// `.inReplyTo` array contains comment IDs.
-	for (const comment of comments) {
+	for (const comment of thread.comments) {
 		let inReplyTo = getInReplyToPostIds(comment, {
 			boardId,
 			threadId: thread.id,
@@ -89,18 +96,20 @@ export default function Thread(thread, comments, {
 			}
 		}
 	}
-	// Set `.replies` array for each comment
-	// based on the `.inReplyTo` array.
-	// `.replies` array contains comment IDs.
-	// Can only come after `.inReplyTo` arrays are set on comments.
-	setReplies(comments, { expandReplies })
+	if (!withLatestComments) {
+		// Set `.replies` array for each comment
+		// based on the `.inReplyTo` array.
+		// `.replies` array contains comment IDs.
+		// Can only come after `.inReplyTo` arrays are set on comments.
+		setReplies(thread.comments, { expandReplies })
+	}
 	// If `thread.title` is missing then copy it from
 	// the first comment's `title`.
 	if (!thread.title) {
-		thread.title = comments[0].title
+		thread.title = thread.comments[0].title
 	}
 	// Add `.parseContent()` function to each `comment` (if required).
-	for (const comment of comments) {
+	for (const comment of thread.comments) {
 		if (parseContent === false) {
 			if (shouldAddParseContent) {
 				// Create a "closure" here, otherwise it would reuse the
@@ -115,6 +124,7 @@ export default function Thread(thread, comments, {
 						threadId: thread.id,
 						parseCommentContent,
 						getCommentById,
+						markDeletedPosts,
 						messages,
 						generatedQuoteMaxLength,
 						generatedQuoteMinFitFactor,
@@ -151,6 +161,7 @@ export default function Thread(thread, comments, {
 			generatePostLinksAndUpdatePreview(comment, {
 				threadId: thread.id,
 				getCommentById,
+				markDeletedPosts,
 				messages,
 				generatedQuoteMaxLength,
 				generatedQuoteMinFitFactor,
@@ -165,10 +176,9 @@ export default function Thread(thread, comments, {
 	// All chans except `lynxchan` have this.
 	// `lynxchan` doesn't have it which is a bug
 	// but seems like they don't want to fix it.
-	if (comments[0].createdAt) {
-		thread.createdAt = comments[0].createdAt
+	if (thread.comments[0].createdAt) {
+		thread.createdAt = thread.comments[0].createdAt
 	}
-	thread.comments = comments
 	// If `thread.title` is missing then attempt to autogenerate
 	// thread title from the first comment's `content`.
 	if (!thread.title) {
