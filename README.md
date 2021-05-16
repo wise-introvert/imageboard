@@ -438,6 +438,9 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   isNotSafeForWork: boolean?,
   // "Bump limit" for threads on this board.
   bumpLimit: number?,
+  // "Comments posted per hour" stats for this board.
+  // Is supported by `makaba` and `lynxchan`.
+  commentsPerHour: number?,
   // The maximum attachments count in a thread.
   // Only present for 4chan.org
   maxAttachmentsInThread: number?,

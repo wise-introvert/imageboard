@@ -27,23 +27,11 @@
 		"getThreadsWithLatestCommentsPage": "/{boardId}/{page}.json",
 		"getBoardsPage": "/boards.js?json=1&page={page}"
 	},
-	"boardCategories": [
-		{
-			"title": "VIP",
-			"tag": "menu-1\\/u\\/vip-(\\d+)"
-		},
-		{
-			"title": "Allgemein",
-			"tag": "menu-2\\/n\\/allgemein-(\\d+)"
-		},
-		{
-			"title": "Weltweit",
-			"tag": "menu-3\\/n\\/weltweit-(\\d+)"
-		},
-		{
-			"title": "Sonstiges",
-			"tag": "menu-4\\/n\\/sonstiges-(\\d+)"
-		}
-	],
-	"boardCategoryRest": "Andere"
+	"boardCategoryTitleById": {
+		"vip": "VIP",
+		"allgemein": "Allgemein",
+		"weltweit": "Weltweit",
+		"sonstiges": "Sonstiges",
+		"*": "Andere"
+	}
 }

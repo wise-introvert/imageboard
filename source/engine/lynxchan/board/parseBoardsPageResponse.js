@@ -22,15 +22,13 @@ export default function parseBoardsPage(response, options) {
 		description: board.boardDescription,
 		isNotSafeForWork: board.specialSettings && !board.specialSettings.includes('sfw'),
 		isLocked: board.specialSettings && board.specialSettings.includes('locked'),
+		commentsPerHour: board.postsPerHour,
 		tags: board.tags
 	}))
 
-	if (options.chan === 'kohlchan') {
-		const boardCategories = options.boardCategories.map((boardCategory) => ({
-			...boardCategory,
-			tag: new RegExp(boardCategory.tag)
-		}))
+	const { chan, boardCategoryTitleById } = options
 
+	if (chan === 'kohlchan') {
 		for (const board of boards) {
 			const tag = board.tags[0]
 			if (tag) {
@@ -38,8 +36,8 @@ export default function parseBoardsPage(response, options) {
 					category,
 					categoryOrder,
 					order
-				} = getBoardCategoryAndOrderByTag(board.tags[0], {
-					boardCategories
+				} = getBoardCategoryAndOrderByTag(tag, {
+					boardCategoryTitleById
 				})
 				if (category) {
 					board.category = category
@@ -49,13 +47,16 @@ export default function parseBoardsPage(response, options) {
 			}
 		}
 
+		boards.sort(compareBoardsByOrder)
+
 		for (const board of boards) {
-			if (!board.category) {
-				board.category = options.boardCategoryRest
+			if (board.category) {
+				delete board.categoryOrder
+				delete board.order
+			} else {
+				board.category = boardCategoryTitleById['*']
 			}
 		}
-
-		boards.sort(compareKohlchanBoards)
 	}
 
 	return {
@@ -64,24 +65,23 @@ export default function parseBoardsPage(response, options) {
 	}
 }
 
-function getBoardCategoryAndOrderByTag(tag, { boardCategories }) {
-	let i = 0
-	while (i < boardCategories.length) {
-		const category = boardCategories[i]
-		const match = tag.match(category.tag)
-		if (match) {
-			const order = parseInt(match[1])
-			return {
-				category: category.title,
-				categoryOrder: i + 1,
-				order
-			}
+const KOHL_CHAN_BOARD_CATEGORY_TAG_REG_EXP = /^menu-(\d+)\/[nu]\/(.+)-(\d+)$/
+
+function getBoardCategoryAndOrderByTag(tag, { boardCategoryTitleById }) {
+	const match = tag.match(KOHL_CHAN_BOARD_CATEGORY_TAG_REG_EXP)
+	if (match) {
+		const categoryOrder = parseInt(match[1])
+		const categoryId = match[2]
+		const order = parseInt(match[3])
+		return {
+			category: boardCategoryTitleById[categoryId] || categoryId,
+			categoryOrder,
+			order
 		}
-		i++
 	}
 }
 
-function compareKohlchanBoards(a, b) {
+function compareBoardsByOrder(a, b) {
 	if (a.category && !b.category) {
 		return -1
 	} else if (!a.category && b.category) {
