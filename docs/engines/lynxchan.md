@@ -57,15 +57,276 @@ One may also refer to `KohlNumbra` client [source code](https://gitgud.io/Tjark/
 
 ## Read-only `GET` API
 
-Not covered here yet.
+### File
 
-See the official docs or the source code in the `source/engine/lynxchan` folder for the details.
+```js
+{
+  // File name.
+  originalName: "Maskensauffaden.jpg",
 
-The usual stuff is supported:
+  // File URL.
+  path: "/.media/cdc9ee93ff7a17c01c7edebb1d6dc095fd478365ca7088c1867872717029a644.jpg",
 
-* `/{boardId}/catalog.json` for the list of threads on a board.
+  // Picture thumbnail URL.
+  thumb: "/.media/t_cdc9ee93ff7a17c01c7edebb1d6dc095fd478365ca7088c1867872717029a644",
 
-* `/{boardId}/res/{threadId}.json` for the list of comments in a thread.
+  // File MIME type.
+  mime: "image/jpeg",
+
+  // File size (in bytes).
+  size: 361180,
+
+  // Picture width.
+  width: 2287,
+
+  // Picture height.
+  height: 1286
+}
+```
+
+### Post
+
+```js
+{
+  // "Thread-wise" ID of the post author.
+  id: null,
+
+  // Post author name.
+  name: "Bernd",
+
+  // Post author email.
+  email: null,
+
+  // Post author role.
+  signedRole: null,
+
+  // (optional)
+  // Flag ID.
+  // Whatever that is.
+  flagCode: "-br",
+
+  // (optional)
+  // Flag URL.
+  flag: "/.static/flags/de.png",
+
+  // (optional)
+  // Flag name.
+  flagName: "Deutschland",
+
+  // Post ID.
+  postId: 5024457,
+
+  // Post title.
+  subject: null,
+
+  // Post content (in Markdown format).
+  markdown: "<a class=\"quoteLink\" href=\"/b/res/5024427.html#5024442\">&gt;&gt;5024442</a>\nDas mag alles wahr sein, aber er gab guten KC-Trunkenbolden Zuflucht, und das wird auch der neue machen, und der nach ihm. Lasse doch alle gestört sein. Solange wir nicht zuviel von einer Seite sehen müssen, soll es doch sein, ne~",
+
+  // Post content (in HTML format).
+  message: ">>5024442\r\nDas mag alles wahr sein, aber er gab guten KC-Trunkenbolden Zuflucht, und das wird auch der neue machen, und der nach ihm. Lasse doch alle gestört sein. Solange wir nicht zuviel von einer Seite sehen müssen, soll es doch sein, ne~",
+
+  // (optional)
+  // If the author was banned for this post,
+  // this is gonna be the reason for the ban.
+  banMessage: "Test test test",
+
+  // Post creation date, in "ISO 8601" date format.
+  creation: "2021-05-16T00:53:19.504Z",
+
+  // (optional)
+  // The date of the last time the post was edited, in "ISO 8601" date format.
+  lastEditTime: "2021-05-16T00:53:19.504Z",
+
+  // (optional)
+  // The login of the last user to edit this post.
+  lastEditLogin: "admin",
+
+  // Attachments.
+  // (empty if no attachments)
+  files: File[]
+}
+```
+
+### Thread
+
+```js
+{
+  // WebSocket port for listening to new comments.
+  wsPort: 8443,
+
+  // (optional)
+  // Secure WebSocket port for listening to new comments.
+  wssPort: 12345,
+
+  // Board ID.
+  boardUri: "b",
+
+  // Thread ID.
+  threadId: 5024427,
+
+  // All properties of the "main" ("opening") post of this thread.
+  // All properties of that `Post` object excluding `postId`.
+  ...Post,
+
+  // Is the thread archived.
+  archived: false,
+
+  // Is the thread locked.
+  locked: false,
+
+  // Is the thread sticky.
+  pinned: false,
+
+  // Is the thread "rolling".
+  cyclic: false,
+
+  // Is the thread "auto-sage".
+  // "Auto-sage" threads never get bumped, even when someone leaves a comment.
+  autoSage: false,
+
+  // Thread comments.
+  // (not including the main comment)
+  posts: Post[]
+}
+```
+
+### Get the list of threads on a board
+
+`GET` `/{boardId}/catalog.json`
+
+Returns a (brief) list of threads on a board, every thread object having a shape:
+
+```js
+{
+  // Thread ID.
+  threadId: 123,
+
+  // Thread subject.
+  subject: "...",
+
+  // The main comment of the thread (in HTML format).
+  message: "...",
+
+  // The main comment of the thread (in Markdown format).
+  markdown: "...",
+
+  // How many replies are there in the thread:
+  // the total comments count excluding the "main" comment.
+  postCount: 0,
+
+  // How many attachments are there in the replies in this thread:
+  // the total attachments count excluding the attachments of the "main" comment.
+  fileCount: 0,
+
+  // Could be used for splitting the list of threads into pages.
+  page: 1,
+
+  // Whether the thread is locked.
+  locked: false,
+
+  // Whether the thread is sticky.
+  pinned: false,
+
+  // Whether the thread is "rolling".
+  cyclic: false,
+
+  // The URL of the thumbnail of the first image posted in the thread, if any.
+  thumb: "/...",
+
+  // The MIME type of the `thumb` file.
+  mime: "image/jpeg",
+
+  // The latest comment date, in "ISO 8601" date format.
+  lastBump: "2021-05-16T00:53:19.504Z",
+
+  // Is the thread "auto-sage".
+  // "Auto-sage" threads never get bumped, even when someone leaves a comment.
+  autoSage: false
+}
+```
+
+There's a bug in `lynxchan` engine when there're no `files` on each thread object in the `catalog.json` response. `kohlchan.net` has fixed that bug by patching the code: they include the `files` property on each thread object in the `catalog.json` response.
+
+### Get the list of threads on a board (page)
+
+`GET` `/{boardId}/{pageNumber}.json`
+
+Response:
+
+```js
+{
+  pageCount: 20,
+
+  boardName: "KAHANECHECK",
+
+  boardDescription: ".",
+
+  // Board settings.
+  settings: [
+    "disableIds",
+    "forceAnonymity"
+  ],
+
+  // Maximum comment length.
+  maxMessageLength: 16384,
+
+  // Maximum attachments count in a post.
+  maxFileCount: 4,
+
+  // The maximum attachment size (of an individual file).
+  maxFileSize: "100.00 MB",
+
+  // Indicates the captcha mode for the board.
+  // 0 means no captcha,
+  // 1 means only for new threads,
+  // 2 means for all posts on the board.
+  captchaMode: 0,
+
+  // Indicates if the site has global captcha turned on.
+  globalCaptcha: true/false,
+
+  // Indicates whether solving a CAPTCHA is required for reporting.
+  noReportCaptcha: true/false,
+
+  // Available report categories.
+  reportCategories: ["spam"],
+
+  // (optional)
+  // Board "flags" (badges).
+  flagData: [{
+    // ID of the flag.
+    _id: 123,
+    // Name of the flag.
+    name: "Name"
+  }, ...],
+
+  threads: Thread[]
+}
+```
+
+Each thread has a `.posts[]` property. The first `Post` is the "main comment" of the thread, the rest `Post`s are the "latest comments" in the thread.
+
+Also, each thread has `ommitedPosts: number` (incorrectly named) property — it's the count of all "omitted" comments: that would be all comments in a thread excluding the "main" comment and excluding the "latest comments" that're listed in the `posts[]` list.
+
+There's no [`ommitedFiles: number`](https://gitgud.io/LynxChan/LynxChan/-/issues/53) equivalent for the "omitted" files count.
+
+### Get thread
+
+`GET` `/{boardId}/res/{threadId}.json`
+
+Returns a `Thread` object, with the addition of the following properties:
+
+* `boardName`: Board name. Example: `"KAHANECHECK"`.
+* `boardDescription` — Board description. Example: `"."`.
+* `boardMarkdown` — Board description in markdown format. Example `null`.
+* `maxMessageLength` — Max comment length. Example: `16384`.
+* `usesCustomCss` — Whether the board uses custom CSS. Example: `false`.
+* `usesCustomJs` — Whether the board uses custom JS. Example: `false`.
+* `maxFileCount` — Maximum attachments count in a post. Example: `4`.
+* `maxFileSize` — The maximum attachment size (of an individual file). Example: `"100.00 MB"`.
+* `forceAnonymity` — Is `true` if there's no "Author Name" or "Author Email" inputs on this board.
+* `captcha: boolean` — Is `true` if posting a comment in the thread requires solving a CAPTCHA.
+* `textBoard: boolean` — Is `true` if the board is a "text" board (no attachments).
 
 ## Read/write `GET`/`POST` API
 
@@ -101,8 +362,8 @@ Returns a CAPTCHA challenge ID:
 
 ```js
 {
-	status: "ok",
-	data: "60a05555ea4467737e851ebb"
+  status: "ok",
+  data: "60a05555ea4467737e851ebb"
 }
 ```
 
@@ -219,70 +480,70 @@ Response:
 
 ```js
 {
-	// Can possibly be an error (like "maintenance").
-	// See the POST API response format for more info.
-	status: "ok",
+  // Can possibly be an error (like "maintenance").
+  // See the POST API response format for more info.
+  status: "ok",
 
-	data: {
-		// Results pages count.
-		// If more than `1`, then the full list of the boards
-		// can be retrieved by iterating through all avialable page numbers
-		// by passing the `page` parameter of the "get boards list" API.
-		pageCount: 1,
+  data: {
+    // Results pages count.
+    // If more than `1`, then the full list of the boards
+    // can be retrieved by iterating through all avialable page numbers
+    // by passing the `page` parameter of the "get boards list" API.
+    pageCount: 1,
 
-		// (optional)
-		// An "overboard" is a board showing all threads
-		// from all other boards.
-		// It can be used to view all threads on an imageboard,
-		// like viewing all the latest comments on an imageboard.
-		overboard: "alle",
+    // (optional)
+    // An "overboard" is a board showing all threads
+    // from all other boards.
+    // It can be used to view all threads on an imageboard,
+    // like viewing all the latest comments on an imageboard.
+    overboard: "alle",
 
-		// (optional)
-		// A "safe-for-work" portion of the "overboard" board.
-		sfwOverboard: "nvip",
+    // (optional)
+    // A "safe-for-work" portion of the "overboard" board.
+    sfwOverboard: "nvip",
 
-		// The list of boards.
-		boards: [{
-			// Board ID.
-			boardUri: "int",
+    // The list of boards.
+    boards: [{
+      // Board ID.
+      boardUri: "int",
 
-			// Board name.
-			boardName: "International",
+      // Board name.
+      boardName: "International",
 
-			// Board description.
-			boardDescription: ".",
+      // Board description.
+      boardDescription: ".",
 
-			// Latest post ID.
-			lastPostId: 11797395,
+      // Latest post ID.
+      lastPostId: 11797395,
 
-			// "Posts per hour" metric of the board.
-			postsPerHour: 769,
+      // "Posts per hour" metric of the board.
+      postsPerHour: 769,
 
-			// (optional)
-			// How many unique IP addresses posted on the board in the last 24 hours.
-			uniqueIps: 12345,
+      // (optional)
+      // How many unique IP addresses posted on the board in the last 24 hours.
+      uniqueIps: 12345,
 
-			// A list of board "tags".
-			// Can be an empty array.
-			tags: [
-				"menu-1/u/vip-2"
-			],
+      // A list of board "tags".
+      // Can be an empty array.
+      tags: [
+        "menu-1/u/vip-2"
+      ],
 
-			// (optional)
-			specialSettings: [
-				// Indicates that the board is "safe for work".
-				"sfw",
+      // (optional)
+      specialSettings: [
+        // Indicates that the board is "safe for work".
+        "sfw",
 
-				// Indicates that the board is locked.
-				"locked"
-			],
+        // Indicates that the board is locked.
+        "locked"
+      ],
 
-			// (optional)
-			// Indicates the board has been marked inactive
-			// due to its owner not logging in for too long.
-			inactive: false
-		}, ...]
-	}
+      // (optional)
+      // Indicates the board has been marked inactive
+      // due to its owner not logging in for too long.
+      inactive: false
+    }, ...]
+  }
 }
 ```
 
@@ -459,25 +720,25 @@ Response example:
 
 ```js
 {
-	status: "ok",
-	data: {
-		threads: [
-			{
-				boardUri: "mu",
-				threadId: 764,
-				creation: "2019-08-01T22:20:52.375Z",
-				subject: "Musikabladefaden",
-				message: "Temporäres Lager für gewünschtes Liedgut."
-			},
-			...
-		],
+  status: "ok",
+  data: {
+    threads: [
+      {
+        boardUri: "mu",
+        threadId: 764,
+        creation: "2019-08-01T22:20:52.375Z",
+        subject: "Musikabladefaden",
+        message: "Temporäres Lager für gewünschtes Liedgut."
+      },
+      ...
+    ],
 
-		// Results pages count.
-		// If more than `1`, then the full list of the boards
-		// can be retrieved by iterating through all avialable page numbers
-		// by passing the `page` parameter of the "get boards list" API.
-		pages: 1
-	}
+    // Results pages count.
+    // If more than `1`, then the full list of the boards
+    // can be retrieved by iterating through all avialable page numbers
+    // by passing the `page` parameter of the "get boards list" API.
+    pages: 1
+  }
 }
 ```
 
@@ -590,11 +851,11 @@ Response example:
 
 ```js
 {
-	status: "ok",
-	data: {
-		valid: false,
-		mode: 1
-	}
+  status: "ok",
+  data: {
+    valid: false,
+    mode: 1
+  }
 }
 ```
 
