@@ -493,7 +493,7 @@ Bans, unless marked as "non-bypassable", can be "bypassed" by solving a "computa
 
 Parameters:
 
-* `action`: the action to be performed. Possible values: `ban`, `ban-delete`.
+* `action`: the action to be performed. Possible values: `ban` (ban the user), `ban-delete` (ban the user and also delete their comments).
 * `reasonBan`: reason of the ban.
 * `banMessage`: message to be displayed in the banned content.
 * `banType`: type of ban. `0` bans only the IPs of the selected posts and requires a valid expiration. `1` creates range bans off the first half of the IPs and `2` creates range bans off the first `3/4` of the IPs. `3` creates an ASN (Autonomous System Number) ban.
@@ -526,7 +526,7 @@ Parameters:
 
 #### Show the list of bans
 
-Shows the "offense record" for a given user (what? requires authentication?).
+Shows the "offense record" for a given user (requires authentication? or not?).
 
 `POST` to `/offenseRecord.js?json=1`
 
@@ -546,9 +546,32 @@ Returns an array with the offense records found. Contains objects with the follo
 * `expiration: date`: expiration of the action taken.
 * `mod: string`: login of the user that took the action.
 
-### Get ban bypass status
+### Block bypass
+
+A user may use a "block bypass" feature in order to attempt to bypass a ban, if the ban was not created as non-bypassable.
+
+The procedure looks like:
+
+* Try to post.
+* If `error: "banned"` is returned:
+  * Check the "block bypass" status:
+    * If `valid` then it means that the ban is "non-bypassable". Won't be able to post (at least on that board).
+    * If not `valid`:
+      * If `mode` is `0`, then can't use a "block bypass" mechanism. Won't be able to post (at least on that board).
+      * If `mode` is not `0`, then attempt to "renew" a "bypass":
+        * Request a CAPTCHA challenge.
+        * Post the CAPTCHA challenge solution to the "bypass renewal" API. Check that the response is `status: "ok"`.
+        * Re-check the "block bypass" status:
+          * If still not `valid` then that would be weird. Won't be able to post (at least on that board).
+          * If now `valid` then:
+            * If `validated` is not `false` then try to post.
+            * If `validated` is `false` then "validate" the "bypass" by performing a Proof-of-Work technique. Check that the response is `status: "ok"`, they try to post.
+
+### Get block bypass status
 
 `GET` `/blockBypass.js?json=1`
+
+Requires a `bypass` cookie that holds a "block bypass" ID.
 
 Responds with an object with information about the current "block bypass" status. Contains the following fields:
 
@@ -571,9 +594,9 @@ Response example:
 }
 ```
 
-### Bypass a Ban
+### Renew block bypass
 
-Allows the user to renew his "block bypass". Bypasses longer than 372 characters (what? the total posted characters length sum?) require validation, see ["Validating a ban bypass"](#validating-a-ban-bypass).
+Allows the user to renew their "block bypass". "Bypasses longer than 372 characters" (presumably, that's the total character count posted using a "bypass") require "validation", see ["Validate block bypass"](#validate-block-bypass).
 
 `POST` to `/renewBypass.js?json=1`
 
@@ -581,29 +604,20 @@ Parameters:
 
 * `captcha`: CAPTCHA solution. Perhaps, a CAPTCHA should be requested first.
 
-Perhaps the procedure is:
+Sets a `bypass` cookie holding the new "block bypass" ID.
 
-* If not banned, post normally.
-* If banned:
-  * Check the "ban bypass" status:
-    * If `valid` then post normally.
-    * If not `valid`:
-    	* If `mode` is `0`, then can't post.
-    	* If `mode` is not `0`, then "renew" a "bypass":
-    	  * Request a CAPTCHA challenge.
-    	  * Post the CAPTCHA challenge solution to the "bypass renewal" API.
-    	  * Re-check the "ban bypass" status:
-  				* If not `valid` then can't post.
-    			* If `valid` then:
-    				* If `validated` is not `false` then can post.
-    				* If `validated` is `false` then "validate" a "bypass" in order to be able to post.
+### Validate block bypass
 
-### Validating a Ban Bypass
-
-Proof-of-Work "ban bypass" validation mechanism.
+Proof-of-Work "block bypass" validation mechanism.
 
 `POST` to `/validateBypass.js?json=1`
 
 Parameters:
 
-* `code` — The brute forced code. To find this code follow this logic: get the bypass cookie, ignore the first 24 characters. Take the following 344 characters as the base string and the next 344 characters as the resulted hash. Now try numbers starting from 0 as the salt through PBKDF2 with sha 512, 16384 iterations and 256 derived bytes (not bits). When you find a derivation that matches the resulted hash, submit that number as the code. Submitting the wrong code will result in the deletion of the bypass.
+* `code` — The brute forced code. To find this code follow this logic:
+
+  * Get the `bypass` cookie value, ignore the first `24` characters.
+  * Take the following `344` characters as the base string and the next `344` characters as the resulted hash.
+  * Now try numbers starting from `0` as the salt through `PBKDF2` with `SHA512`, `16384` iterations and `256` derived bytes (not bits).
+  * When you find a derivation that matches the resulted hash, submit that number as the code.
+  * Submitting the wrong code will result in the deletion of the bypass.
