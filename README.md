@@ -1020,11 +1020,13 @@ The only imageboard running on `makaba` engine is currently [`2ch.hk`](https://2
 
 ### lynxchan
 
-[`lynxchan`](https://gitgud.io/LynxChan/LynxChan) seems to be the only still-being-maintained imageboard engine left. Has [JSON API](https://gitgud.io/LynxChan/LynxChan/blob/master/doc/Json.txt).
+[`lynxchan`](https://gitgud.io/LynxChan/LynxChan) seems to be the only still-being-maintained imageboard engine left. Has [JSON API](https://gitgud.io/LynxChan/LynxChan/blob/master/doc/Json.txt) and [POST API](https://gitgud.io/LynxChan/LynxChan/-/blob/master/doc/Form.txt).
+
+* [`lynxchan` API](https://gitlab.com/catamphetamine/imageboard/blob/master/docs/engines/lynxchan.md).
 
 Chans running on `lynxchan`:
 
-* [`kohlchan.net`](http://kohlchan.net). Also see [`kohlchan` API (with examples)](https://gitlab.com/catamphetamine/imageboard/blob/master/docs/kohlchan.md).
+* [`kohlchan.net`](http://kohlchan.net).
 
 <!--
 * [Old API (with examples)](https://gitlab.com/catamphetamine/imageboard/blob/master/docs/kohlchan.net.old.md) (the old `vichan` API is no longer relevant: since May 28th, 2019 `kohlchan.net` [has been migrated](https://kohlchan.net/kohl/res/13096.html) from `vichan` to `lynxchan`)

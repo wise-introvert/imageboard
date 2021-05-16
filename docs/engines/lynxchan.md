@@ -1,0 +1,609 @@
+# `lynxchan` API
+
+[`lynxchan`](https://gitgud.io/LynxChan/LynxChan) seems to be the only still-being-maintained imageboard engine left.
+
+The APIs provided by the engine are:
+
+* [Read-only `GET` API](https://gitgud.io/LynxChan/LynxChan/-/blob/master/doc/Json.txt) that returns data in `JSON` format.
+
+* [Read/write `GET`/`POST` API](https://gitgud.io/LynxChan/LynxChan/-/blob/master/doc/Form.txt).
+
+This document describes a subset of its API that could be relevant for this library. Refer to the official documentation linked above for the latest and full info.
+
+## Input format
+
+`POST` methods accept [`FormData`](developer.mozilla.org/docs/Web/API/FormData/FormData) as an input and return a response in `JSON` format if `?json=1` URL parameter is passed (otherwise, they return a HTML response page).
+
+## Output format
+
+The read-only `GET` API uses a "free" output format.
+
+The read/write `GET`/`POST` API uses the following JSON response format:
+
+```js
+{
+  status: "status of the operation",
+  data: anything or null
+}
+```
+
+The `status` can be:
+
+* `bypassable`: user has been prevented from posting but its possible for him to use the block bypass to post.
+* `error`: internal server occurred. The error string will be on the data field.
+* `ok`: operation successful.
+* `maintenance`: site is going under maintenance.
+* `banned`: user is banned. In this case, `data` will be an object with the following fields:
+  * `reason`: the reason of the ban.
+  * `board`: board that this ban applies to.
+  * `expiration: Date`: when the ban expires.
+  * `warning: boolean`: if the ban is actually a warning. Warnings are cleared once they are seen.
+  * `asn: number`: asn banned. An "Autonomous System Number" perhaps?
+  * `range`: range banned.
+  * `banId`: id of the ban.
+  * `appealled: boolean`: indicates if the ban has been already appealed.
+* `hashBan`: user tried to upload a banned file. In this case, `data` will be an array where each object contains the following fields:
+  * `file`: name provided for the file.
+  * `boardUri`: board uri of the hash ban. If an empty string, the file is banned globally.
+  * `reason`: reason of the hash ban.
+
+If `status: "banned"` is returned, then one may attempt to ["bypass"](#bypass-a-ban) the ban.
+
+One may also refer to `KohlNumbra` client [source code](https://gitgud.io/Tjark/KohlNumbra/blob/master/static/js/api.js) for the list of possible errors.
+
+## Read-only `GET` API
+
+Not covered here yet.
+
+See the official docs or the source code in the `source/engine/lynxchan` folder for the details.
+
+The usual stuff is supported:
+
+* `/{boardId}/catalog.json` for the list of threads on a board.
+
+* `/{boardId}/res/{threadId}.json` for the list of comments in a thread.
+
+## Read/write `GET`/`POST` API
+
+### CAPTCHA
+
+Some actions like posting new threads, posting new comments, reporting posts, banning users, etc require solving a CAPTCHA in order to prevent spam.
+
+#### Request a CAPTCHA
+
+To request a CAPTCHA, send a `GET` request to `/captcha.js`.
+
+<!-- The response is an HTTP status `302` redirect to a new `Location` URL (a CAPTCHA challege image). Get that URL. -->
+
+<!-- The URL has the format: `/.global/captchas/{captchaId}`, and CAPTCHA challenge ID can be extracted from it. Example of `{captchaId}`: `6091c3b9bce7b946ae3c9539`. -->
+
+It responds with a CAPTCHA challenge image.
+
+Also sets two cookies:
+
+* `captchaid` — The CAPTCHA challenge ID. Example cookie parameters: `Path: /` and `Max-Age: 300` meaning that the captcha expires in 300 seconds if not solved.
+
+* `captchaexpiration` — The CAPTCHA challenge expiration date. A stringified javascript date. Example: `"Tue, 04 May 2021 22:16:58 GMT"`. Can be converted back to a `Date` object by passing this string as an argument to the `Date()` constructor.
+
+#### Request a CAPTCHA (no cookies)
+
+`GET` `/noCookieCaptcha.js?json=1`
+
+URL Parameters:
+
+* `solvedCaptcha` — (optional) If the user has already solved a CAPTCHA before, specify the already solved CAPTCHA challenge ID here. Presumably, the server will determine whether a new CAPTCHA is required to be solved, or the user can post without solving a new CAPTCHA for now. The official docs don't explain the meaning of this parameter.
+
+Returns a CAPTCHA challenge ID:
+
+```js
+{
+	status: "ok",
+	data: "60a05555ea4467737e851ebb"
+}
+```
+
+The CAPTCHA challenge image URL is `/.global/captchas/{captchaId}`.
+
+Note that the received CAPTCHA challenge has a timeout that you won't be able to find out.
+
+#### Solve a CAPTCHA
+
+To solve the received CAPTCHA challenge, `POST` to `/solveCaptcha.js?json=1`.
+
+Parameters:
+
+* `captchaId` — The ID of the CAPTCHA challenge. Example: `"60a05555ea4467737e851ebb"`.
+* `answer` — CAPTCHA challenge solution.
+
+The solved CAPTCHA ID is then required to be sent on all relevant `POST` actions, such as posting a comment, posting a thread, banning a user, reporting a post, etc.
+
+### Posting Attachments
+
+For posting attachments, provide a `files` `FormData` parameter that should be an array of HTML `File` objects.
+
+Also, for each file, the following `FormData` parameters should be added. `FormData` supports adding a parameter with the same name multiple times, in which case it doesn't overwrite the previously added value but instead preserves all added values of the parameter. The parameters should be added for each file, following the order of the files in the `files` array.
+
+* `fileSha256` — A SHA256 hash of the file. This is used to ID files by their content, and then block some of them from being posted.
+* `fileMime` — The [MIME type](developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/MIME_types) of the file.
+* `fileSpoiler` — Pass any non-empty string to indicate that the file should be hidden under a "spoiler". Pass an empty string otherwise.
+* `fileName` — The original file name.
+
+#### Check an attachment before upload
+
+Every attachment should first be checked for having already been uploaded by someone before.
+
+`GET` `/checkFileIdentifier.js?json=1`
+
+Parameters:
+
+* `identifier` — A SHA256 hash of the file contents.
+
+Returns `true` if the file already exists.
+
+### Report a post
+
+`POST` to `/contentActions.js?json=1`
+
+Parameters:
+
+* `action`: Action to be performed. `report`.
+* `categoryReport`: Category of the report.
+* `reasonReport`: Report reason.
+* `globalReport`: if a non-empty string, indicates that the report is "global".
+* `captchaReport`: CAPTCHA solution.
+
+### Delete or restore a post or a thread
+
+`POST` to `/contentActions.js?json=1`
+
+Parameters:
+
+* `action`: action to be performed. `delete`, `trash`, `restore`, `ip-deletion`, `thread-ip-deletion`.
+* `password`: password to be used for deletion.
+* `deleteUploads`: if a non-empty string, only the uploads and not the posts and threads will be deleted.
+* `deleteMedia`: if a non-empty string and the user is part of the global staff, when deleting files or postings, the actual media files will be removed from the server.
+* `confirmation`: must be a non-empty string when using `ip-deletion` as the action.
+
+When using "regular deletion" (what?), outputs an object with the following fields:
+
+* `removedThreads: number`: amount of deleted threads.
+* `removedPosts: number`: amount of deleted posts.
+
+### Delete all posts and threads by a poster IP address
+
+Deletes posts and threads from an IP address from multiple boards. Reserved for users with an role equal or lower than the global setting `clearIpMinRole`.
+
+`POST` to `/deleteFromIp.js?json=1`
+
+Parameters:
+
+`ip` — the IP address.
+`boards` — the IDs of the boards to have posts deleted. If not specified, the posts from the IP address will be deleted from all boards.
+
+### Add a spoiler to post attachments
+
+`POST` to `/contentActions.js?json=1`
+
+Parameters:
+
+* `action`: action to be performed. `spoil`.
+* `password`: password to be used (maybe not relevant here).
+
+### Get the list of boards
+
+`GET` `/boards.js?json=1`
+
+URL Parameters:
+
+* `unindexed`: If anything is passed, displays only unindexed boards.
+* `inactive`: If anything is passed, displays only inactive boards.
+* `sfw`: If anything is passed, displays only sfw boards.
+* `page`: The page to be viewed.
+* `boardUri`: Board ID.
+* `tags`: (optional) Tags to be searched for. Only boards having all of the specified tags will be returned. Example: `["tagName"]`.
+* `sorting`: sorting to be used:
+  * `1`: from least popular to most popular.
+  * `2`: from most posts to least posts.
+  * `3`: from least posts to most posts.
+  * `4`: from highest PPH to lowest PPH.
+  * `5`: from lowest PPH to highest PPH.
+  * `6`: alphabetic order.
+  * `7`: reverse alphabetic order.
+  * Anything else sorts them from most popular to least popular.
+
+Response:
+
+```js
+{
+	// Can possibly be an error (like "maintenance").
+	// See the POST API response format for more info.
+	status: "ok",
+
+	data: {
+		// Results pages count.
+		// If more than `1`, then the full list of the boards
+		// can be retrieved by iterating through all avialable page numbers
+		// by passing the `page` parameter of the "get boards list" API.
+		pageCount: 1,
+
+		// (optional)
+		// An "overboard" is a board showing all threads
+		// from all other boards.
+		// It can be used to view all threads on an imageboard,
+		// like viewing all the latest comments on an imageboard.
+		overboard: "alle",
+
+		// (optional)
+		// A "safe-for-work" portion of the "overboard" board.
+		sfwOverboard: "nvip",
+
+		// The list of boards.
+		boards: [{
+			// Board ID.
+			boardUri: "int",
+
+			// Board name.
+			boardName: "International",
+
+			// Board description.
+			boardDescription: ".",
+
+			// Latest post ID.
+			lastPostId: 11797395,
+
+			// "Posts per hour" metric of the board.
+			postsPerHour: 769,
+
+			// (optional)
+			// How many unique IP addresses posted on the board in the last 24 hours.
+			uniqueIps: 12345,
+
+			// A list of board "tags".
+			// Can be an empty array.
+			tags: [
+				"menu-1/u/vip-2"
+			],
+
+			// (optional)
+			specialSettings: [
+				// Indicates that the board is "safe for work".
+				"sfw",
+
+				// Indicates that the board is locked.
+				"locked"
+			],
+
+			// (optional)
+			// Indicates the board has been marked inactive
+			// due to its owner not logging in for too long.
+			inactive: false
+		}, ...]
+	}
+}
+```
+
+### Create a board
+
+`POST` to `/createBoard.js?json=1`
+
+Parameters:
+
+* `boardUri`: URI of the new board. 32 characters, lower case and numbers only.
+* `boardName`: name of the new board. 32 characters.
+* `boardDescription`: description of the new board. 128 characters.
+* `captcha`: CAPTCHA solution.
+
+### Delete a board
+
+`POST` to `/deleteBoard.js?json=1`
+
+Parameters:
+
+* `boardUri`: URI of the board to be deleted.
+* `confirmDeletion: boolean`: confirmation that the board should be deleted.
+
+Allowed for board owners and users with global role lower than 2.
+
+### Sign Up
+
+Creates a new account.
+
+`POST` to `/registerAccount.js?json=1`
+
+Parameters:
+
+`login`: 16 characters max. Only `a-Z`,`_` and `0-9` are allowed.
+`password`
+`email`: 64 characters max.
+`captcha`: CAPTCHA solution.
+
+### Request Email Confirmation
+
+Requests a confirmation e-mail to be sent to the user's registered e-mail. Requires authentication.
+
+`POST` to `/requestEmailConfirmation.js?json=1`
+
+### Confirm Email Address
+
+`POST` to `/confirmEmail.js?json=1`
+
+Parameters:
+
+* `login`
+* `hash` — The token that was sent in the confirmation email.
+
+### Log In
+
+`POST` to `/login.js?json=1`
+
+Parameters:
+
+* `login`
+* `password`
+* `remember: boolean`: if `true`, the session expiration time will be longer.
+
+### Log Out
+
+`POST` to `/logout.js?json=1`
+
+Logs the user out invalidating their authentication cookies.
+
+### Request Account Recovery
+
+`POST` to `/requestAccountRecovery.js?json=1`
+
+Parameters:
+
+* `login`
+* `captcha`: CAPTCHA solution.
+
+Sends an e-mail to the user with a link so they can recover their account.
+
+### Recover Account
+
+`GET` `/recoverAccount.js?json=1`
+
+URL parameters (because this link is clicked by the user in an account recovery email):
+
+* `login`
+* `hash`: hash of the recovery request.
+
+Creates a new random password and e-mails it to the user.
+
+### Post a comment
+
+`POST` to `/replyThread.js?json=1`
+
+Parameters:
+
+* `noFlag`: (optional) if the board has `locationFlagMode` as `1`, and a non-empty string is passed, then it won't show the user's location flag on the comment.
+* `name`: (optional) name of the poster. 32 characters.
+* `email`: (optional) e-mail of the poster. 64 characters.
+* `message`: (optional) message to be posted. 4096 characters. Mandatory if no files are sent.
+* `subject`: (optional) subject of the thread. 128 characters.
+* `password`: (optional) password to be used for deletion. 8 characters.
+* `boardUri`: Board ID.
+* `threadId`: Thread ID
+* `captcha`: (optional) CAPTCHA solution.
+* `spoiler`: (optional) if anything is sent, indicates the images should be spoilered.
+* `flag`: (optional) id of a flag to be used.
+
+Returns the ID of the new post (a number).
+
+When posting any attachments, first [check](#check-an-attachment-before-upload) every attachment on whether it has already been uploaded to the server and whether it's banned.
+
+One may also refer to `KohlNumbra` client [source code](https://gitgud.io/Tjark/KohlNumbra/-/blob/master/src/js/thread.js) for an implementation of posting a comment.
+
+### Post a thread
+
+`POST` to `/newThread.js?json=1`
+
+Parameters are the same as for posting a new comment, only that `threadId` is omitted and `message` is required.
+
+Returns the ID of the new thread (a number).
+
+### Change thread settings
+
+Performs general control actions on a thread, like locking and pinning.
+
+`POST` to `/changeThreadSettings.js?json=1`
+
+Parameters:
+
+* `boardUri` — Board ID.
+* `threadId` — Thread ID.
+* `lock`: indicates if the thread must be locked. Any value sent will lock, if not sent, will unlock.
+* `pin`: indicates if the thread must be pinned. Any value will pin, if not sent, will unpin.
+* `cyclic`: indicates if the thread must be set on cyclic mode. Any value will put in cyclic mode. If not sent, will remove cyclic mode.
+
+### Edit a post
+
+Restricted to global staff and board staff.
+
+`POST` to `/saveEdit.js?json=1`
+
+Parameters:
+
+* `boardUri`: URI of the board.
+* `threadId`: id of the thread.
+* `postId`: id of the post to be edited.
+* `subject`: new subject. 128 characters max.
+* `message`: new message.
+
+### Archive a thread
+
+Adds a thread to the archives. Requires authentication.
+
+`POST` to `/archiveThread.js?json=1`
+
+Parameters:
+
+* `boardUri` — Board ID.
+* `threadId: number` — Thread ID.
+* `confirmation: boolean` — Confirmation of the action.
+
+### Show threads archive
+
+`GET` `/archives.js?json=1`
+
+URL Parameters:
+
+* `boards` — The list of board IDs.
+* `page` — (optional) Page number (in case of iterating through several pages).
+
+Response example:
+
+```js
+{
+	status: "ok",
+	data: {
+		threads: [
+			{
+				boardUri: "mu",
+				threadId: 764,
+				creation: "2019-08-01T22:20:52.375Z",
+				subject: "Musikabladefaden",
+				message: "Temporäres Lager für gewünschtes Liedgut."
+			},
+			...
+		],
+
+		// Results pages count.
+		// If more than `1`, then the full list of the boards
+		// can be retrieved by iterating through all avialable page numbers
+		// by passing the `page` parameter of the "get boards list" API.
+		pages: 1
+	}
+}
+```
+
+### Bans
+
+Bans can be:
+
+* Range bans — bans a range of IP addresses.
+* ASN bans — bans a whole ["Autonomous System"](https://en.wikipedia.org/wiki/Autonomous_system_(Internet)) by its ["Autonomous System Number"](https://afrinic.net/asn).
+* Hash bans — bans a file by its [SHA256](https://en.wikipedia.org/wiki/SHA-2) hash.
+
+Bans, unless marked as "non-bypassable", can be "bypassed" by solving a "computationally intensive" challenge (a "Proof-of-Work" mechanism).
+
+### Ban a user
+
+`POST` to `/contentActions.js?json=1`
+
+Parameters:
+
+* `action`: the action to be performed. Possible values: `ban`, `ban-delete`.
+* `reasonBan`: reason of the ban.
+* `banMessage`: message to be displayed in the banned content.
+* `banType`: type of ban. `0` bans only the IPs of the selected posts and requires a valid expiration. `1` creates range bans off the first half of the IPs and `2` creates range bans off the first `3/4` of the IPs. `3` creates an ASN (Autonomous System Number) ban.
+* `globalBan`: if any value is passed, indicates the bans are "global".
+* `nonBypassable`: if a non-empty string, "broad bans" (what?) applied as part of this action will not be able to be "bypassable".
+* `deleteMedia`: if a non-empty string and the user is part of the global staff, when deleting files or postings, the actual media files will be removed from the server.
+* `deleteUploads`: if a non-empty string, only the uploads and not the posts and threads will be deleted.
+* `duration`: duration of the ban. See the "Ban Duration" section for the format description. Defaults to 5 years.
+* `captchaBan`: CAPTCHA solution. Ignored for bans when the user is part of the global staff.
+
+### Ban duration
+
+The syntax for setting ban durations uses the following fields:
+
+* `y`: year
+* `M`: month
+* `d`: day
+* `h`: hour
+* `m`: minute
+
+So if you write `"2d 1h"` it will create a 49 hour ban. The order and spacing doesn't matter. The same could be written as `"1h 2d"`.
+
+### Unban a user
+
+`POST` to `/liftBan.js?json=1`
+
+Parameters:
+
+* `banId`: id of the ban.
+
+#### Show the list of bans
+
+Shows the "offense record" for a given user (what? requires authentication?).
+
+`POST` to `/offenseRecord.js?json=1`
+
+Parameters:
+
+* `banId`: id of a ban to search all offenses from the same author.
+* `boardUri`: uri of the board to check a posting's ip and bypass offense record.
+* `postId`: postId of the posting to check the ip's and bypass' offense record.
+* `threadId`: threadId of the posting to check the ip's and bypass' offense record.
+* `ip`: ip to check it's offense record.
+
+Returns an array with the offense records found. Contains objects with the following fields:
+
+* `reason`: reason of the action.
+* `global: boolean`: `true` if the action was global.
+* `date: date`: date of the action taken.
+* `expiration: date`: expiration of the action taken.
+* `mod: string`: login of the user that took the action.
+
+### Get ban bypass status
+
+`GET` `/blockBypass.js?json=1`
+
+Responds with an object with information about the current "block bypass" status. Contains the following fields:
+
+* `valid: boolean`: indicates if the user has a valid "block bypass".
+* `validated: boolean`: indicates if the bypass needs Proof-of-Work validation.
+* `mode: number`: current "block bypass" mode.
+  * `0` — disabled. The user can't use a "block bypass" mechanism.
+  * `1` — enabled. The user can use a "block bypass" mechanism if required.
+  * `2` — mandatory. The user must use a "block bypass" mechanism in order to post.
+
+Response example:
+
+```js
+{
+	status: "ok",
+	data: {
+		valid: false,
+		mode: 1
+	}
+}
+```
+
+### Bypass a Ban
+
+Allows the user to renew his "block bypass". Bypasses longer than 372 characters (what? the total posted characters length sum?) require validation, see ["Validating a ban bypass"](#validating-a-ban-bypass).
+
+`POST` to `/renewBypass.js?json=1`
+
+Parameters:
+
+* `captcha`: CAPTCHA solution. Perhaps, a CAPTCHA should be requested first.
+
+Perhaps the procedure is:
+
+* If not banned, post normally.
+* If banned:
+  * Check the "ban bypass" status:
+    * If `valid` then post normally.
+    * If not `valid`:
+    	* If `mode` is `0`, then can't post.
+    	* If `mode` is not `0`, then "renew" a "bypass":
+    	  * Request a CAPTCHA challenge.
+    	  * Post the CAPTCHA challenge solution to the "bypass renewal" API.
+    	  * Re-check the "ban bypass" status:
+  				* If not `valid` then can't post.
+    			* If `valid` then:
+    				* If `validated` is not `false` then can post.
+    				* If `validated` is `false` then "validate" a "bypass" in order to be able to post.
+
+### Validating a Ban Bypass
+
+Proof-of-Work "ban bypass" validation mechanism.
+
+`POST` to `/validateBypass.js?json=1`
+
+Parameters:
+
+* `code` — The brute forced code. To find this code follow this logic: get the bypass cookie, ignore the first 24 characters. Take the following 344 characters as the base string and the next 344 characters as the resulted hash. Now try numbers starting from 0 as the salt through PBKDF2 with sha 512, 16384 iterations and 256 derived bytes (not bits). When you find a derivation that matches the resulted hash, submit that number as the code. Submitting the wrong code will result in the deletion of the bypass.

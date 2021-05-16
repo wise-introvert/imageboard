@@ -1,5 +1,7 @@
 `kohlchan.net` uses a customized version of `lynxchan` engine.
 
+Note: this document may (or may not entirely) be superceded by the [`lynxchan` API](https://gitlab.com/catamphetamine/imageboard/blob/master/docs/engines/lynxchan.md) description.
+
 ### CAPTCHA
 
 To request a CAPTCHA, send a `GET` request to `/captcha.js?d={date}` where `{date}` can be a stringified javascript `Date`, for example `Wed%20May%2005%202021%2000:59:20%20GMT+0300%20(Moscow%20Standard%20Time)`.
@@ -108,65 +110,3 @@ Files banned error response example:
 where `data` is the ID of the new comment.
 
 See `KohlNumbra` [source code](https://gitgud.io/Tjark/KohlNumbra/-/blob/master/src/js/thread.js) for full info.
-
-### Post a thread
-
-To post a new thread, send a `POST` request to `/newThread.js?json=1` with the same parameters as when posting a new comment, just without `threadId` parameter.
-
-Error response example:
-
-```js
-{
-	status: "error",
-	data: "This board requires at least one file when creating threads."
-}
-```
-
-Spam error response example:
-
-```js
-{
-	status: "error",
-	data: "Flood detected, wait 484 more seconds."
-}
-```
-
-"Success" response example:
-
-```js
-{
-	status: "ok",
-	data: 12345
-}
-```
-
-where `data` is the ID of the new thread.
-
-See `KohlNumbra` [source code](https://gitgud.io/Tjark/KohlNumbra/-/blob/master/src/js/board.js) for full info.
-
-### Report
-
-To report a comment, send a `POST` request to `/contentActions.js?json=1` with parameters:
-
-* `captchaReport` — CAPTCHA challenge solution (only if a CAPTCHA challenge was shown). Example: `"KaBSNK"`
-* `reasonReport` — A rationale for reporting the comment, along with a report category in parentheses: `spam`, `illegal content` or `other` . Example: `"Test (spam)"`.
-* `action` — `"report"`.
-* `test-1` — `"true"`. It's not clear what this is. Maybe it should be omitted.
-
-Error response example:
-
-```js
-{
-	status: "error",
-	data: "Wrong answer or expired captcha."
-}
-```
-
-"Success" response example:
-
-```js
-{
-	status: "ok",
-	data: null
-}
-```
