@@ -18,5 +18,4 @@ While [adding support](http://lynxhub.com/lynxchan/res/722.html#q984) for [`lynx
 * (can be hacked around) No `size` for the `thumb` thumbnail URL on threads in `/catalog.json` API response.
 * (can be hacked around) No `postCount` for threads in `/catalog.json` API response when they have no replies.
 * (can be hacked around) No `fileCount` for threads in `/catalog.json` API response when they have no attachments in replies.
-* (not significant) No `omittedFiles` count for threads in `/{page}.json` API response. [Issue](https://gitgud.io/LynxChan/LynxChan/-/issues/53).
 * Doesn't provide board category in `/boards.js?json=1` API response. Provides `tags[]` but doesn't provide category title and category order in the list of categories.

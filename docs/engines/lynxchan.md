@@ -306,9 +306,9 @@ Response:
 
 Each thread has a `.posts[]` property. The first `Post` is the "main comment" of the thread, the rest `Post`s are the "latest comments" in the thread.
 
-Also, each thread has `ommitedPosts: number` (incorrectly named) property — it's the count of all "omitted" comments: that would be all comments in a thread excluding the "main" comment and excluding the "latest comments" that're listed in the `posts[]` list.
+Also, each thread has `omittedPosts: number` property (that was incorrectly named `ommitedPosts` before version `2.7.0`) — it's the count of all "omitted" comments: that would be all comments in a thread excluding the "main" comment and excluding the "latest comments" that're listed in the `posts[]` list.
 
-There's no [`ommitedFiles: number`](https://gitgud.io/LynxChan/LynxChan/-/issues/53) equivalent for the "omitted" files count.
+Also, each thread may have an [`omittedFiles: number?`](https://gitgud.io/LynxChan/LynxChan/-/issues/53) property (that has been added in version `2.7.0`) — it's the count of all "omitted" attachments: that would be count of all attachments in all comments in a thread excluding the "main" comment and excluding the "latest comments" that're listed in the `posts[]` list. The `omittedFiles` property doesn't seem to be present when it's `0`.
 
 ### Get thread
 
