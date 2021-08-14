@@ -12,7 +12,7 @@ This document describes a subset of its API that could be relevant for this libr
 
 Or, refer to `lynxchan` [source codes](https://gitgud.io/LynxChan/LynxChan/-/tree/master/src/be/form) to get the full details on the API.
 
-Also, there's `KohlNumbra` client [source code](https://gitgud.io/Tjark/KohlNumbra/blob/master/static/js/api.js) that could be used as a reference.
+Also, there's `KohlNumbra` client [source code](https://gitgud.io/Tjark/KohlNumbra/-/blob/master/src/js/api.js) that could be used as a reference.
 
 ## Input format
 
@@ -384,26 +384,28 @@ The solved CAPTCHA ID is then required to be sent on all relevant `POST` actions
 
 ### Posting Attachments
 
-For posting attachments, provide a `files` `FormData` parameter that should be an array of HTML `File` objects.
+`lynxchan` de-duplicates the same files being posted across the imageboard, so for each file being uploaded one should first check whether the file has already been uploaded by someone else.
 
-Also, for each file, the following `FormData` parameters should be added. `FormData` supports adding a parameter with the same name multiple times, in which case it doesn't overwrite the previously added value but instead preserves all added values of the parameter. The parameters should be added for each file, following the order of the files in the `files` array.
-
-* `fileSha256` — A SHA256 hash of the file. This is used to ID files by their content, and then block some of them from being posted.
-* `fileMime` — The [MIME type](developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/MIME_types) of the file.
-* `fileSpoiler` — Pass any non-empty string to indicate that the file should be hidden under a "spoiler". Pass an empty string otherwise.
-* `fileName` — The original file name.
-
-#### Check an attachment before upload
-
-Every attachment should first be checked for having already been uploaded by someone before.
+#### Check if the file has already been uploaded
 
 `GET` `/checkFileIdentifier.js?json=1`
 
 Parameters:
 
-* `identifier` — A SHA256 hash of the file contents.
+* `identifier` — A [SHA256](https://medium.com/@0xVaccaro/hashing-big-file-with-filereader-js-e0a5c898fc98) hash of the file contents.
 
-Returns `true` if the file already exists.
+Returns `true` if the file already exists: in such case, there's no need to upload the file to the server.
+
+#### Adding attachments to post data
+
+Post data is sent to the server in `FormData` format. `FormData` supports adding a parameter with the same name multiple times, in which case it doesn't overwrite the previously added value but instead preserves all added values of the parameter. For every attachment, the following parameters should be added to `FormData`:
+
+* `fileSha256` — A SHA256 hash of the file, computed at the previous step. This is used to ID files by their content, which allows admins to block certain files from being posted on an imageboard, and it also de-duplicates the same file being posted across the imageboard.
+* `fileMime` — The [MIME type](developer.mozilla.org/docs/Web/HTTP/Basics_of_HTTP/MIME_types) of the file.
+* `fileSpoiler` — Pass any non-empty string to indicate that the file should be hidden under a "spoiler". Pass an empty string otherwise.
+* `fileName` — The file name.
+
+The parameters listed above should be added for each file. Then, for all files that haven't been uploaded to the imageboard server yet, add them to the `files: File[]` parameter of the `FormData`. After that, the `FormData` can be posted to the server.
 
 ### Report a post
 
