@@ -474,27 +474,93 @@ Seems to be [no such API endpoint](https://github.com/4chan/4chan-API/issues/64)
 
 "Chanu" mobile apps seem to just [parse the HTML](https://github.com/grzegorznittner/chanu/blob/8a65b87847ff1aea0366cf3c1e03d70edb94e36c/app/src/main/java/com/chanapps/four/service/FetchPopularThreadsService.java#L277-L286) of the "Popular threads" section of `4chan.org` main page to get the list of "Popular threads".
 
-There's also a website called [`4stats.io`](4stats.io). I contacted `4stats.io` admins and they replied with a detailed explanation. Their approach is as follows:
+There's also a website called [`4stats.io`](4stats.io). I contacted `4stats.io` admins and they replied with a detailed explanation. Their approach to calculating "posts per minute" and "threads per minute" stats of a board is:
 
-* [Get the list of threads of a board](#get-threads-list).
+* [Get the list of threads in a board](#get-threads-list).
 
-* Find the max post ID and max thread ID.
+* Find the max post ID (the ID of the latest comment on a board) and max thread ID.
 
-* Store `maxPostID` and `maxThreadID` somewhere in state (calculating board stats is "stateful" while calculating thread stats can be "stateless").
+* Store `maxPostID` and `maxThreadID` somewhere in state until the next refresh.
 
 * Wait for `N` minutes.
 
-* Get the list of threads of a board again.
+* Get the list of threads in a board again. Find the max post ID and max thread ID again.
 
-* Post IDs are local to a board so the amount of posts added since the previous time is the difference of max post IDs: `getMaxPostID(response) - state.maxPostID`. Divide it by `N` and it will be the "posts per minute" stats for the board.
+* Post IDs are local to a board so the amount of posts added since the previous refresh is the difference of max post IDs: `newMaxPostID - state.maxPostID`. Divide it by `N` and it will be the "posts per minute" stats for the board.
 
-* Count threads having IDs greater than `state.maxThreadId`. Divide it by `N` and it will be the "threads per minute" stats for the board.
+* Count the amount of threads having IDs greater than `state.maxThreadId`. Divide that amount by `N` and it will be the "threads per minute" stats for the board. This stats is not completely accurate because it may have missed some threads that have been created and then deleted (or expired) in-between the refreshes.
 
-* (stateless) Calculate an approximate "posts per minute" for each thread: `(thread.replies / (current_unix_time - thread.time)) / 60`. This is an average "posts per minute" stats for a thread across its entire lifespan.
+The above steps are performed for each board with a delay of `>= 1 sec` between moving from one board to another due to the 4chan API request rate limit of "max one request per second".
 
-The above steps are performed for each board with a delay `>= 1 sec` between moving from one board to another due to the 4chan API request rate limit of "max one request per second".
+To get "posts per minute" stats of a thread (for example, for sorting threads by "popularity"):
 
-The reason why "posts per minute" stats for threads is calculated in a "stateless" approximate manner is because it can be a good-enough approximation of what kind of threads people generally participate in. Alternatively, precise "posts per minute" stats for threads could be calculated by storing `thread.replies` in state for each thread and then, say, after `M` hours the precise "posts per minute" stats for a thread would be calculated as `(thread.replies - getStateForMinutesAgo(M * 60).findThreadById(thread.id).replies) / (M * 60)`. Such "precise" approach would require storing more data in the database and is therefore more complex. It's likely that the "stateless" approximation already gives good-enough results so no extra precision is required.
+```
+postsCount = thread.repliesCount + 1
+threadLifetimeInMinutes = (currentUnixTimestamp - thread.createdAtUnixTimestamp) / 60
+postsPerMinute = postsCount / threadLifetimeInMinutes
+```
+
+That would be an average "posts per minute" stats for a thread across its entire lifespan. It's not completely accurate because it assumes that replies are evenly spread throughout the thread's lifetime.
+
+Even though the "posts per minute" stats for a thread is an approximation, it can still be a good-enough indicator of what kind of threads people generally participate in (aka "popular" threads).
+
+If a thread is a new one then its "posts per minute" stats is not reliable. For example, if `thread.createdAtUnixTimestamp` is equal to `currentUnixTimestamp` then it's `postsPerMinute` is `Infinity` due to the division by zero. So a thread's lifetime should be assumed at least a minute.
+
+Or, for example, if a thread has been created just a minute earlier, then its `postsPerMinute` stats is `1` and it will be moved to the top of the rating on a "slow" board just because other threads only usually get something like a single comment in an hour.
+
+So a rating of a thread should account for two metrics: the "posts per minute" stats and the total posts count in the thread.
+
+<details>
+<summary>See an example</summary>
+
+#####
+
+```js
+function calculateThreadRating(thread) {
+	let threadLifetime = Date.now() - thread.createdAt.getTime()
+	// The server time can be off due to misconfiguration.
+	if (threadLifetime < 0) {
+		threadLifetime = 0
+	}
+	let threadLifetimeInMinutes = (threadLifetime / 1000) / 60
+	// If a thread is a new one then its "posts per minute" stats is not reliable.
+	// For example, if `thread.createdAtUnixTimestamp` is equal to `currentUnixTimestamp`
+	// then it's `postsPerMinute` is `Infinity` due to the division by zero.
+	// So a thread's lifetime should be assumed at least a minute.
+	if (threadLifetimeInMinutes < 1) {
+		threadLifetimeInMinutes = 1
+	}
+	const postsPerMinute = thread.commentsCount / threadLifetimeInMinutes
+	switch (thread.commentsCount) {
+		case 1:
+			return 0
+		case 2:
+			return 0.01 * postsPerMinute
+		case 3:
+			return 0.05 * postsPerMinute
+		case 4:
+			return 0.1 * postsPerMinute
+		case 5:
+			return 0.3 * postsPerMinute
+		case 6:
+			return 0.5 * postsPerMinute
+		case 7:
+			return 0.7 * postsPerMinute
+		case 8:
+			return 0.8 * postsPerMinute
+		case 9:
+			return 0.9 * postsPerMinute
+		default:
+			return postsPerMinute
+	}
+}
+```
+</details>
+
+#####
+
+
+Alternatively, a precise "posts per minute" stats for a thread could be calculated by first storing `thread.replies` count somewhere in a state, and then, at the next refresh, after `N` minutes, the precise "posts per minute" stats for the thread would be calculated as `(thread.replies - getStateForMinutesAgo(N).findThreadById(thread.id).replies) / N`. Such "more precise" approach would require storing more data in the database and is therefore more complex. It's likely that the "stateless" approximation already provides good-enough results.
 
 ### Post a comment
 
@@ -593,7 +659,7 @@ Since there seems to be no API for getting a list of valid report categories for
 
 To apply a "pass" code when posting a comment, `4chan_apass` and `4chan_auser` cookies should be set.
 
-To log in with a "pass", send a `POST` request to `https://sys.4chan.or/auth` with parameters:
+To log in with a "pass", send a `POST` request to `https://sys.4chan.org/auth` (or `https://sys.4channel.org/auth`) with parameters:
 
 * `act` — `"do_login"`
 * `id` — The "pass".
