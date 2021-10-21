@@ -102,7 +102,11 @@ One may also refer to `KohlNumbra` client [source code](https://gitgud.io/Tjark/
 
   // (optional)
   // Flag ID.
-  // Whatever that is.
+  // Supposedly a lowercased country code prefixed with a dash.
+  // It's not clear whether imageboards can assign their own custom `flagCode`s.
+  // It's not clear if it's a reliable assumption that this is a proper country code
+  // and can't be anything else.
+  // I assume it can only be a valid country code.
   flagCode: "-br",
 
   // (optional)
