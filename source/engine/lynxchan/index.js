@@ -1,18 +1,18 @@
-import Engine from '../../Engine'
+import Engine from '../../Engine.js'
 
-import parseBoardsResponse from './board/parseBoardsResponse'
-import parseBoardsPageResponse from './board/parseBoardsPageResponse'
-import parseThreadsResponse from './thread/parseThreadsResponse'
-import parseThreadsPageResponse from './thread/parseThreadsPageResponse'
-import parseThreadResponse from './thread/parseThreadResponse'
-import parseComment from './comment/parseComment'
+import parseBoardsResponse from './board/parseBoardsResponse.js'
+import parseBoardsPageResponse from './board/parseBoardsPageResponse.js'
+import parseThreadsResponse from './thread/parseThreadsResponse.js'
+import parseThreadsPageResponse from './thread/parseThreadsPageResponse.js'
+import parseThreadResponse from './thread/parseThreadResponse.js'
+import parseComment from './comment/parseComment.js'
 
-import Board from '../../Board'
-import Thread from '../../Thread'
-import Comment from '../../Comment'
+import Board from '../../Board.js'
+import Thread from '../../Thread.js'
+import Comment from '../../Comment.js'
 
-import PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins'
-import KOHLCHAN_PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.kohlchan'
+import PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.js'
+import KOHLCHAN_PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.kohlchan.js'
 
 export default class LynxChan extends Engine {
 	constructor(chanSettings, options) {

@@ -1,9 +1,9 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import KohlChan from '../../../chan/kohlchan'
+import KohlChan from '../../../chan/kohlchan/index.js'
 import KohlChanConfig from '../../../../chans/kohlchan/index.json'
 
-import { fixNewLineCharacters } from './parseComment'
+import { fixNewLineCharacters } from './parseComment.js'
 
 function parseCommentTest(comment, options, expected, expectedWarnings = []) {
 	const consoleWarn = console.warn

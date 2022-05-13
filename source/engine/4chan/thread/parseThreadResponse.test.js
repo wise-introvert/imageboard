@@ -1,9 +1,9 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import FourChan from '../../../chan/4chan'
+import FourChan from '../../../chan/4chan/index.js'
 
-import API_RESPONSE_1 from './parseThreadResponse.test.input.1'
-import RESULT_1 from './parseThreadResponse.test.output.1'
+import API_RESPONSE_1 from './parseThreadResponse.test.input.1.json'
+import RESULT_1 from './parseThreadResponse.test.output.1.js'
 
 describe('4chan.org', () => {
 	it('should parse thread', () => {

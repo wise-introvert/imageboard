@@ -1,5 +1,5 @@
-import parseThread from './parseThread'
-import getBoardInfo from '../board/getBoardInfo'
+import parseThread from './parseThread.js'
+import getBoardInfo from '../board/getBoardInfo.js'
 
 /**
  * Parses "get thread comments" API response.

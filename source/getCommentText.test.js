@@ -1,6 +1,6 @@
-import getCommentText from './getCommentText'
+import getCommentText from './getCommentText.js'
 
-import expectToEqual from './utility/expectToEqual'
+import expectToEqual from './utility/expectToEqual.js'
 
 describe('getCommentText', () => {
 	it('should get comment text', () => {

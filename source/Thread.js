@@ -1,8 +1,8 @@
-import createByIdIndex from './utility/createByIdIndex'
-import getInReplyToPostIds from './getInReplyToPostIds'
-import setReplies from './setReplies'
-import generateThreadTitle from './generateThreadTitle'
-import { generatePostLinksAndUpdatePreview, addParseContent } from './parseContent'
+import createByIdIndex from './utility/createByIdIndex.js'
+import getInReplyToPostIds from './getInReplyToPostIds.js'
+import setReplies from './setReplies.js'
+import generateThreadTitle from './generateThreadTitle.js'
+import { generatePostLinksAndUpdatePreview, addParseContent } from './parseContent.js'
 
 export default function Thread(thread, {
 	boardId,

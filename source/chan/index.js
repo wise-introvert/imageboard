@@ -1,12 +1,12 @@
 // This file only exists for multi-chan applications.
 
-import TwoChan from './2ch'
-import FourChan from './4chan'
-import EightChan from './8ch'
-import KohlChan from './kohlchan'
-import EndChan from './endchan'
-import LainChan from './lainchan'
-import ArisuChan from './arisuchan'
+import TwoChan from './2ch/index.js'
+import FourChan from './4chan/index.js'
+import EightChan from './8ch/index.js'
+import KohlChan from './kohlchan/index.js'
+import EndChan from './endchan/index.js'
+import LainChan from './lainchan/index.js'
+import ArisuChan from './arisuchan/index.js'
 
 export default function getChan(chanId) {
 	switch (chanId) {

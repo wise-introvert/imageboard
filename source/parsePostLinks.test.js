@@ -1,10 +1,10 @@
-import parsePostLinks from './parsePostLinks'
+import parsePostLinks from './parsePostLinks.js'
 
-import expectToEqual from './utility/expectToEqual'
+import expectToEqual from './utility/expectToEqual.js'
 
-import FourChannel from './chan/4chan'
-import EightChannel from './chan/8ch'
-import TwoChannel from './chan/2ch'
+import FourChannel from './chan/4chan/index.js'
+import EightChannel from './chan/8ch/index.js'
+import TwoChannel from './chan/2ch/index.js'
 
 describe('parsePostLinks', () => {
 	it('should parse anchor post links', () => {

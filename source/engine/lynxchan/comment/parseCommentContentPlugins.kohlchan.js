@@ -1,12 +1,12 @@
-import createLink from '../../../utility/createLink'
-import dropQuoteMarker from '../../../dropQuoteMarker'
-import parsePostLink from '../../../parsePostLink'
+import createLink from '../../../utility/createLink.js'
+import dropQuoteMarker from '../../../dropQuoteMarker.js'
+import parsePostLink from '../../../parsePostLink.js'
 
-import PARSE_COMMENT_CONTENT_PLUGINS from './parseCommentContentPlugins'
+import PARSE_COMMENT_CONTENT_PLUGINS from './parseCommentContentPlugins.js'
 
 // Since May 28th, 2019 `kohlchan.net` has been migrated from `vichan` to `lynxchan`.
 // The old messages still have the old markup.
-import LEGACY_MARKUP_PLUGINS from '../../4chan/comment/parseCommentContentPlugins.kohlchan'
+import LEGACY_MARKUP_PLUGINS from '../../4chan/comment/parseCommentContentPlugins.kohlchan.js'
 
 const EMOTE_ID_REG_EXP = /^\/\.static\/images\/([^/]+)\.png$/
 

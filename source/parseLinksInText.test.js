@@ -1,6 +1,6 @@
-import expectToEqual from './utility/expectToEqual'
+import expectToEqual from './utility/expectToEqual.js'
 
-import parseLinksInText from './parseLinksInText'
+import parseLinksInText from './parseLinksInText.js'
 
 describe('parseLinksInText', () => {
 	it('shouldn\'t parse links in text when there are no links in text', () => {

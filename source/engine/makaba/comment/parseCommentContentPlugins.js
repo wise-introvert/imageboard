@@ -1,5 +1,5 @@
-import dropQuoteMarker from '../../../dropQuoteMarker'
-import createLink from '../../../utility/createLink'
+import dropQuoteMarker from '../../../dropQuoteMarker.js'
+import createLink from '../../../utility/createLink.js'
 
 const inlineQuote = {
 	tag: 'span',

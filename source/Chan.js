@@ -1,7 +1,7 @@
 // This file only exists for multi-chan applications.
 
-import getEngine from './engine/index'
-import getChan from './chan/index'
+import getEngine from './engine/index.js'
+import getChan from './chan/index.js'
 
 export default function Chan(chanConfig, options) {
 	if (typeof chanConfig === 'string') {

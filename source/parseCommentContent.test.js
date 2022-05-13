@@ -1,6 +1,6 @@
-import expectToEqual from './utility/expectToEqual'
+import expectToEqual from './utility/expectToEqual.js'
 
-import parseCommentContent from './parseCommentContent'
+import parseCommentContent from './parseCommentContent.js'
 
 function parseCommentTest(comment, expected, expectedWarnings = []) {
 	const consoleWarn = console.warn

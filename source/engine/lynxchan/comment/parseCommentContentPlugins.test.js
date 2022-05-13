@@ -1,9 +1,9 @@
-import PARSE_COMMENT_CONTENT_PLUGINS from './parseCommentContentPlugins.kohlchan'
+import PARSE_COMMENT_CONTENT_PLUGINS from './parseCommentContentPlugins.kohlchan.js'
 
-import expectToEqual from '../../../utility/expectToEqual'
-import parseCommentContent from '../../../parseCommentContent'
-import splitParagraphs from '../../../splitParagraphs'
-import trimContent from '../../../utility/trimContent'
+import expectToEqual from '../../../utility/expectToEqual.js'
+import parseCommentContent from '../../../parseCommentContent.js'
+import splitParagraphs from '../../../splitParagraphs.js'
+import trimContent from '../../../utility/trimContent.js'
 
 function parseCommentTest(comment, expected, expectedWarnings = []) {
 	const consoleWarn = console.warn

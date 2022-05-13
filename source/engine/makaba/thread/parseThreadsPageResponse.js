@@ -1,5 +1,5 @@
-import getBoardInfo from '../board/getBoardInfo'
-import parseThread from './parseThread'
+import getBoardInfo from '../board/getBoardInfo.js'
+import parseThread from './parseThread.js'
 
 /**
  * Parses "get threads list" page API response.

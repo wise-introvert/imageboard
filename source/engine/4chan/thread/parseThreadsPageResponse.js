@@ -1,4 +1,4 @@
-import parseThread from './parseThread'
+import parseThread from './parseThread.js'
 
 /**
  * Parses "get threads list" page API response.

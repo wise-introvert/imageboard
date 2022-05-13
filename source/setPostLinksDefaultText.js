@@ -1,6 +1,6 @@
-import visitPostParts from 'social-components/commonjs/utility/post/visitPostParts'
+import visitPostParts from 'social-components/commonjs/utility/post/visitPostParts.js'
 
-import getPostLinkDefaultText from './getPostLinkDefaultText'
+import getPostLinkDefaultText from './getPostLinkDefaultText.js'
 
 /**
  * Sets `post-link`s `content`:

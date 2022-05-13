@@ -1,5 +1,5 @@
-import parseBoard from './parseBoard'
-import parseBoardEightChan from './parseBoard.8ch'
+import parseBoard from './parseBoard.js'
+import parseBoardEightChan from './parseBoard.8ch.js'
 
 /**
  * Parses chan API response for boards list.

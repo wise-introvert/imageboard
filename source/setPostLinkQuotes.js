@@ -1,7 +1,7 @@
-import { forEachFollowingQuote } from 'social-components/commonjs/utility/post/combineQuotes'
-import generatePostQuote from 'social-components/commonjs/utility/post/generatePostQuote'
+import { forEachFollowingQuote } from 'social-components/commonjs/utility/post/combineQuotes.js'
+import generatePostQuote from 'social-components/commonjs/utility/post/generatePostQuote.js'
 
-import getPostLinkDefaultText from './getPostLinkDefaultText'
+import getPostLinkDefaultText from './getPostLinkDefaultText.js'
 
 /**
  * Adds "in-reply-to" quotes.

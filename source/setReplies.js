@@ -1,4 +1,4 @@
-import createByIdIndex from './utility/createByIdIndex'
+import createByIdIndex from './utility/createByIdIndex.js'
 
 /**
  * For each `post` having replies, creates a `post.replies[]` property

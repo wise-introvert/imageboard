@@ -1,6 +1,6 @@
-import generateThreadTitle from './generateThreadTitle'
+import generateThreadTitle from './generateThreadTitle.js'
 
-import expectToEqual from './utility/expectToEqual'
+import expectToEqual from './utility/expectToEqual.js'
 
 describe('generateThreadTitle', () => {
 	it('should generate thread title if the only content is an attachment', () => {

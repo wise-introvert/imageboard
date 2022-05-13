@@ -4,7 +4,7 @@ import {
 	underline,
 	quote,
 	link
-} from './parseCommentContentPlugins'
+} from './parseCommentContentPlugins.js'
 
 // They have advanced code highlighting.
 // https://lainchan.org/faq.html

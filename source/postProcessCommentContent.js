@@ -1,9 +1,9 @@
-import expandStandaloneAttachmentLinks from 'social-components/commonjs/utility/post/expandStandaloneAttachmentLinks'
-// import combineQuotes from 'social-components/commonjs/utility/post/combineQuotes'
+import expandStandaloneAttachmentLinks from 'social-components/commonjs/utility/post/expandStandaloneAttachmentLinks.js'
+// import combineQuotes from 'social-components/commonjs/utility/post/combineQuotes.js'
 
-import removeNewLineCharacters from './removeNewLineCharacters'
-import setPostLinkUrls from './setPostLinkUrls'
-import parseLinksInText from './parseLinksInText'
+import removeNewLineCharacters from './removeNewLineCharacters.js'
+import setPostLinkUrls from './setPostLinkUrls.js'
+import parseLinksInText from './parseLinksInText.js'
 
 export default function postProcessCommentContent(content, {
 	// `comment` is only used by `expandStandaloneAttachmentLinks()`.

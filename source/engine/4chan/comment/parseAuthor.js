@@ -1,4 +1,4 @@
-import unescapeContent from '../../../utility/unescapeContent'
+import unescapeContent from '../../../utility/unescapeContent.js'
 
 export default function parseAuthor(name, { defaultAuthorName, boardId }) {
 	if (defaultAuthorName) {

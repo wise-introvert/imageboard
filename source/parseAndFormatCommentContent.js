@@ -1,7 +1,7 @@
-import parseCommentContent from './parseCommentContent'
-import splitParagraphs from './splitParagraphs'
-import postProcessCommentContent from './postProcessCommentContent'
-import trimContent from 'social-components/commonjs/utility/post/trimContent'
+import parseCommentContent from './parseCommentContent.js'
+import splitParagraphs from './splitParagraphs.js'
+import postProcessCommentContent from './postProcessCommentContent.js'
+import trimContent from 'social-components/commonjs/utility/post/trimContent.js'
 
 export default function parseAndFormatCommentContent(rawComment, {
 	commentUrlParser,

@@ -1,9 +1,9 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import KohlChan from '../../../chan/kohlchan'
+import KohlChan from '../../../chan/kohlchan/index.js'
 
-import API_RESPONSE_1 from './parseThreadResponse.test.input.1'
-import RESULT_1 from './parseThreadResponse.test.output.1'
+import API_RESPONSE_1 from './parseThreadResponse.test.input.1.json'
+import RESULT_1 from './parseThreadResponse.test.output.1.js'
 
 describe('kohlchan.net', () => {
 	it('should parse thread', () => {

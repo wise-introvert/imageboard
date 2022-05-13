@@ -1,12 +1,12 @@
 import {
 	quote,
 	link
-} from './parseCommentContentPlugins'
+} from './parseCommentContentPlugins.js'
 
 import {
 	code,
 	codeBlock
-} from './parseCommentContentPlugins.lainchan'
+} from './parseCommentContentPlugins.lainchan.js'
 
 export const bold = {
 	tag: 'span',

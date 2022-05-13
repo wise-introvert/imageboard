@@ -1,5 +1,5 @@
-import findContentPart from 'social-components/commonjs/utility/post/findContentPart'
-import splitContent from 'social-components/commonjs/utility/post/splitContent'
+import findContentPart from 'social-components/commonjs/utility/post/findContentPart.js'
+import splitContent from 'social-components/commonjs/utility/post/splitContent.js'
 
 /**
  * Splits `content` into paragraphs where there're two or more `\n` characters.

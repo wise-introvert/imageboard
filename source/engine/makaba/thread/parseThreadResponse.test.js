@@ -1,6 +1,6 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import Chan from '../../../Chan'
+import Chan from '../../../Chan.js'
 import TwoChanConfig from '../../../../chans/2ch/index.json'
 
 describe('2ch.hk', () => {

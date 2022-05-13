@@ -1,6 +1,6 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import TwoChan from '../../../chan/2ch'
+import TwoChan from '../../../chan/2ch/index.js'
 import TwoChanConfig from '../../../../chans/2ch/index.json'
 
 function parseCommentTest(comment, options, expected, expectedWarnings = []) {

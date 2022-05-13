@@ -1,21 +1,21 @@
-import Engine from '../../Engine'
+import Engine from '../../Engine.js'
 
-import parseBoardsResponse from './board/parseBoardsResponse'
-import parseThreadsResponse from './thread/parseThreadsResponse'
-import parseThreadsPageResponse from './thread/parseThreadsPageResponse'
-import parseThreadResponse from './thread/parseThreadResponse'
-import parseComment from './comment/parseComment'
-import parsePostResponse from './post/parsePostResponse'
-import parseReportResponse from './report/parseReportResponse'
+import parseBoardsResponse from './board/parseBoardsResponse.js'
+import parseThreadsResponse from './thread/parseThreadsResponse.js'
+import parseThreadsPageResponse from './thread/parseThreadsPageResponse.js'
+import parseThreadResponse from './thread/parseThreadResponse.js'
+import parseComment from './comment/parseComment.js'
+import parsePostResponse from './post/parsePostResponse.js'
+import parseReportResponse from './report/parseReportResponse.js'
 
-import Board from '../../Board'
-import Thread from '../../Thread'
-import Comment from '../../Comment'
+import Board from '../../Board.js'
+import Thread from '../../Thread.js'
+import Comment from '../../Comment.js'
 
-import PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.4chan'
-import EIGHT_CHAN_PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.8ch'
-import LAIN_CHAN_PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.lainchan'
-import ARISU_CHAN_PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.arisuchan'
+import PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.4chan.js'
+import EIGHT_CHAN_PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.8ch.js'
+import LAIN_CHAN_PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.lainchan.js'
+import ARISU_CHAN_PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.arisuchan.js'
 
 export default class FourChan extends Engine {
 	constructor(chanSettings, options) {
@@ -98,7 +98,7 @@ export default class FourChan extends Engine {
 				0
 			)
 		}
-		return this.createThreadObject(thread)
+		return this.createThreadObject(thread, options)
 	}
 
 	/**

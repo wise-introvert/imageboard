@@ -6,7 +6,7 @@ import {
 	// generatePreview,
 	// generateThreadTitle,
 	// setPostLinkQuotes
-} from '../index'
+} from '../index.js'
 
 describe('exports', () => {
 	it('should export ES6', () => {
@@ -21,7 +21,7 @@ describe('exports', () => {
 	})
 
 	it('should export CommonJS', () => {
-		const Library = require('../index.commonjs')
+		const Library = require('../index.commonjs.js')
 		Library.should.be.a('function')
 		Library.default.should.be.a('function')
 		Library.getConfig.should.be.a('function')

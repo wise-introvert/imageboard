@@ -1,6 +1,6 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import LainChan from '../../../chan/lainchan'
+import LainChan from '../../../chan/lainchan/index.js'
 
 const API_RESPONSE = {
   "posts": [

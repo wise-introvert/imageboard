@@ -1,4 +1,4 @@
-import unescapeContent from '../../../utility/unescapeContent'
+import unescapeContent from '../../../utility/unescapeContent.js'
 
 /**
  * Parses response board JSON object.

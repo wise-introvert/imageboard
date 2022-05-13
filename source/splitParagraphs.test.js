@@ -1,6 +1,6 @@
-import expectToEqual from './utility/expectToEqual'
+import expectToEqual from './utility/expectToEqual.js'
 
-import splitParagraphs from './splitParagraphs'
+import splitParagraphs from './splitParagraphs.js'
 
 function splitParagraphsTest(content, result) {
 	return expectToEqual(splitParagraphs(content), result)

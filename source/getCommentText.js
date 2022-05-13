@@ -1,1 +1,1 @@
-export { default as default } from 'social-components/commonjs/utility/post/getPostText'
+export { default as default } from 'social-components/commonjs/utility/post/getPostText.js'

@@ -1,11 +1,11 @@
-import dropQuoteMarker from '../../../dropQuoteMarker'
+import dropQuoteMarker from '../../../dropQuoteMarker.js'
 
 import {
 	bold,
 	italic,
 	quote,
 	link
-} from './parseCommentContentPlugins'
+} from './parseCommentContentPlugins.js'
 
 // `kohlchan.net` spoiler.
 const spoiler = {

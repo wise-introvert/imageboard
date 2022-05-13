@@ -1,6 +1,6 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import FourChan from '../../../chan/4chan'
+import FourChan from '../../../chan/4chan/index.js'
 import FourChanConfig from '../../../../chans/4chan/index.json'
 
 function parseCommentTest(comment, options, expected, expectedWarnings = []) {

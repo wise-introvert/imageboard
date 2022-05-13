@@ -1,4 +1,4 @@
-import generatePostPreview from 'social-components/commonjs/utility/post/generatePostPreview'
+import generatePostPreview from 'social-components/commonjs/utility/post/generatePostPreview.js'
 
 /**
  * Generates a `.contentPreview` from `comment`'s `.content`.

@@ -1,5 +1,5 @@
-import parseAuthor from './parseAuthor'
-import parseAttachments from './parseAttachments'
+import parseAuthor from './parseAuthor.js'
+import parseAttachments from './parseAttachments.js'
 
 // Фраза "Абу благословил этот пост" добавляется в конец поста
 // если этот пост отправлен с использованием "пасс-кода"

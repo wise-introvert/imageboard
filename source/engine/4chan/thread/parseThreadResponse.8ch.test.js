@@ -1,6 +1,6 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import EightChan from '../../../chan/8ch'
+import EightChan from '../../../chan/8ch/index.js'
 
 const API_RESPONSE = {
   "posts": [

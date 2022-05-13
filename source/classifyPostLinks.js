@@ -1,4 +1,4 @@
-import visitPostParts from 'social-components/commonjs/utility/post/visitPostParts'
+import visitPostParts from 'social-components/commonjs/utility/post/visitPostParts.js'
 
 /**
  * Classifies `post-link`s: whether they're `post-link`s to

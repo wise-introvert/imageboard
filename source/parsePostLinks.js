@@ -1,4 +1,4 @@
-import parsePostLink from './parsePostLink'
+import parsePostLink from './parsePostLink.js'
 
 export default function parsePostLinks(rawContent, { commentUrlParser }) {
 	const regExp = / href="(.+?)"/g

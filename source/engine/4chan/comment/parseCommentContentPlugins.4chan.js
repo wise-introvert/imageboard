@@ -1,6 +1,6 @@
-import createLink from '../../../utility/createLink'
-import dropQuoteMarker from '../../../dropQuoteMarker'
-import parsePostLink from '../../../parsePostLink'
+import createLink from '../../../utility/createLink.js'
+import dropQuoteMarker from '../../../dropQuoteMarker.js'
+import parsePostLink from '../../../parsePostLink.js'
 
 import {
 	bold,
@@ -9,7 +9,7 @@ import {
 	code,
 	quote,
 	link
-} from './parseCommentContentPlugins'
+} from './parseCommentContentPlugins.js'
 
 // They have these in `/g/` for some reason.
 const boldLegacy = {

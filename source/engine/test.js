@@ -1,3 +1,3 @@
-import './makaba/test'
-import './4chan/test'
-import './lynxchan/test'
+import './makaba/test.js'
+import './4chan/test.js'
+import './lynxchan/test.js'

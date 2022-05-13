@@ -1,4 +1,4 @@
-import parseAttachment from './parseAttachment'
+import parseAttachment from './parseAttachment.js'
 
 export default function parseAttachments(post, options) {
 	if (!post.ext && !post.extra_files) {

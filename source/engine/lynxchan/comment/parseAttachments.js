@@ -1,4 +1,4 @@
-import parseAttachment, { getPictureTypeFromUrl, guessFileUrlFromThumbnailUrl } from './parseAttachment'
+import parseAttachment, { getPictureTypeFromUrl, guessFileUrlFromThumbnailUrl } from './parseAttachment.js'
 
 export default function parseAttachments(post, {
 	chan,

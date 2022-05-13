@@ -1,4 +1,4 @@
-import createLink from 'social-components/commonjs/utility/post/createLink'
+import createLink from 'social-components/commonjs/utility/post/createLink.js'
 
 const URL_REGEXP = /(?:https?|ftp):\/\/[^\s\/$.?#].[^\s]*/i
 

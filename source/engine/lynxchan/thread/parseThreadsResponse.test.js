@@ -1,10 +1,10 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import Chan from '../../../Chan'
+import Chan from '../../../Chan.js'
 import KohlChanConfig from '../../../../chans/kohlchan/index.json'
 
-import API_RESPONSE from './parseThreadsResponse.test.input.1'
-import THREADS from './parseThreadsResponse.test.output.1'
+import API_RESPONSE from './parseThreadsResponse.test.input.1.json'
+import THREADS from './parseThreadsResponse.test.output.1.js'
 
 describe('kohlchan.net', () => {
 	it('should parse threads', () => {

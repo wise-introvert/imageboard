@@ -1,6 +1,6 @@
-import expectToEqual from './utility/expectToEqual'
+import expectToEqual from './utility/expectToEqual.js'
 
-import dropQuoteMarker from './dropQuoteMarker'
+import dropQuoteMarker from './dropQuoteMarker.js'
 
 function dropQuoteMarkerTest(content, result) {
 	return expectToEqual(dropQuoteMarker(content), result)

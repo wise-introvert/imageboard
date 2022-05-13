@@ -1,8 +1,8 @@
 // This file only exists for multi-chan applications.
 
-import Makaba from './makaba'
-import FourChan from './4chan'
-import LynxChan from './lynxchan'
+import Makaba from './makaba/index.js'
+import FourChan from './4chan/index.js'
+import LynxChan from './lynxchan/index.js'
 
 export default function getEngine(engineId) {
 	switch (engineId) {

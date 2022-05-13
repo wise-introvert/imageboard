@@ -1,4 +1,4 @@
-import './comment/parseCommentContentPlugins.test'
-import './comment/parseComment.test'
-import './thread/parseThreadResponse.test'
-import './thread/parseThreadsResponse.test'
+import './comment/parseCommentContentPlugins.test.js'
+import './comment/parseComment.test.js'
+import './thread/parseThreadResponse.test.js'
+import './thread/parseThreadsResponse.test.js'

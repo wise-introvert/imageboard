@@ -1,4 +1,4 @@
-import parseBoard from './parseBoard'
+import parseBoard from './parseBoard.js'
 
 /**
  * Parses chan API response for boards list.

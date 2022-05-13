@@ -1,6 +1,6 @@
-import expectToEqual from './utility/expectToEqual'
+import expectToEqual from './utility/expectToEqual.js'
 
-import removeNewLineCharacters from './removeNewLineCharacters'
+import removeNewLineCharacters from './removeNewLineCharacters.js'
 
 describe('removeNewLineCharacters', () => {
 	it('should remove new line characters in paragraph text', () => {

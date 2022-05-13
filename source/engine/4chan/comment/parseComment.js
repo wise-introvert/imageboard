@@ -1,8 +1,8 @@
-import unescapeContent from '../../../utility/unescapeContent'
+import unescapeContent from '../../../utility/unescapeContent.js'
 
-import parseAuthor from './parseAuthor'
-import parseAuthorRole from './parseAuthorRole'
-import parseAttachments from './parseAttachments'
+import parseAuthor from './parseAuthor.js'
+import parseAuthorRole from './parseAuthorRole.js'
+import parseAttachments from './parseAttachments.js'
 
 const USER_BANNED_MARK = /<br><br><b style="color:red;">\(USER WAS BANNED FOR THIS POST\)<\/b>$/
 

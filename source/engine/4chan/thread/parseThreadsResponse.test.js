@@ -1,6 +1,6 @@
-import expectToEqual from '../../../utility/expectToEqual'
+import expectToEqual from '../../../utility/expectToEqual.js'
 
-import Chan from '../../../Chan'
+import Chan from '../../../Chan.js'
 import FourChanConfig from '../../../../chans/4chan/index.json'
 
 import API_RESPONSE from './parseThreadsResponse.test.input.1.json'

@@ -1,5 +1,5 @@
-import getMimeType from '../../../utility/getMimeType'
-import splitFilename from '../../../utility/splitFilename'
+import getMimeType from '../../../utility/getMimeType.js'
+import splitFilename from '../../../utility/splitFilename.js'
 
 export default function parseAttachment(file, options) {
 	const { chan } = options

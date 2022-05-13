@@ -1,6 +1,6 @@
-import expectToEqual from './utility/expectToEqual'
+import expectToEqual from './utility/expectToEqual.js'
 
-import setPostLinkQuotes, { endsWithNewLineAndOptionalWhiteSpace } from './setPostLinkQuotes'
+import setPostLinkQuotes, { endsWithNewLineAndOptionalWhiteSpace } from './setPostLinkQuotes.js'
 
 const messages = {
 	comment: {
