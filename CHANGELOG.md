@@ -1,3 +1,12 @@
+0.5.0 / xx.05.2022
+==================
+
+* Changed package exports to "ES Modules".
+
+* Refactored some code.
+
+* Added some new features.
+
 0.4.38 / 16.05.2021
 ==================
 
