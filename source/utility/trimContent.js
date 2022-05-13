@@ -1,1 +1,1 @@
-export { default } from 'social-components/commonjs/utility/post/trimContent.js'
+export { default } from 'social-components/utility/post/trimContent.js'

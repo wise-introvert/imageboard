@@ -1,1 +1,1 @@
-export { default as default } from 'social-components/commonjs/utility/expectToEqual.js'
+export { default as default } from 'social-components/utility/expectToEqual.js'

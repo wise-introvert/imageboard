@@ -1,1 +1,1 @@
-export { default as default, getExtension as getExtension } from 'social-components/commonjs/utility/getMimeType.js'
+export { default as default, getExtension as getExtension } from 'social-components/utility/getMimeType.js'

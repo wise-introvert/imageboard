@@ -1,5 +1,5 @@
-import { forEachFollowingQuote } from 'social-components/commonjs/utility/post/combineQuotes.js'
-import generatePostQuote from 'social-components/commonjs/utility/post/generatePostQuote.js'
+import { forEachFollowingQuote } from 'social-components/utility/post/combineQuotes.js'
+import generatePostQuote from 'social-components/utility/post/generatePostQuote.js'
 
 import getPostLinkDefaultText from './getPostLinkDefaultText.js'
 

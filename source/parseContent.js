@@ -1,4 +1,4 @@
-import { canGeneratePostQuoteIgnoringNestedPostQuotes } from 'social-components/commonjs/utility/post/generatePostQuote.js'
+import { canGeneratePostQuoteIgnoringNestedPostQuotes } from 'social-components/utility/post/generatePostQuote.js'
 
 import generatePreview from './generatePreview.js'
 import setPostLinkQuotes, { getGeneratePostQuoteOptions } from './setPostLinkQuotes.js'
@@ -140,7 +140,7 @@ export function addParseContent(comment, {
 		expandReplies
 	})
 	// `shouldUpdateReplies` is `undefined` when called from
-	// `social-components/source/utility/post/loadResourceLinks.js`,
+	// `social-components/utility/post/loadResourceLinks.js`,
 	// so `shouldUpdateReplies` is assumed to be `true` by default.
 	let shouldUpdateRepliesOnNextParse
 	//
@@ -206,7 +206,7 @@ export function addParseContent(comment, {
 					// not having human-written `content`. Instead, for such `post-link`s,
 					// it will just flag them with `_block: true`.
 					// The `_block` flag will be used later when
-					// `social-components/canGeneratePostQuoteIgnoringNestedPostQuotes()`
+					// `social-components`' `canGeneratePostQuoteIgnoringNestedPostQuotes()`
 					// is called on this comment in order to find out
 					// whether the "previous" comments quoted by this comment,
 					// if there're any, are required to be parsed,

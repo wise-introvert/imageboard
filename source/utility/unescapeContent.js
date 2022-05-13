@@ -1,1 +1,1 @@
-export { default as default } from 'social-components/commonjs/utility/unescapeContent.js'
+export { default as default } from 'social-components/utility/unescapeContent.js'

@@ -1,4 +1,4 @@
-import generatePostQuote from 'social-components/commonjs/utility/post/generatePostQuote.js'
+import generatePostQuote from 'social-components/utility/post/generatePostQuote.js'
 
 /**
  * If `thread.title` is missing then either copy it

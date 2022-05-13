@@ -1,4 +1,4 @@
-import getColorHash from 'social-components/commonjs/utility/getColorHash.js'
+import getColorHash from 'social-components/utility/getColorHash.js'
 
 export default function Comment({
 	boardId,

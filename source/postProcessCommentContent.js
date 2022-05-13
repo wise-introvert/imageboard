@@ -1,5 +1,5 @@
-import expandStandaloneAttachmentLinks from 'social-components/commonjs/utility/post/expandStandaloneAttachmentLinks.js'
-// import combineQuotes from 'social-components/commonjs/utility/post/combineQuotes.js'
+import expandStandaloneAttachmentLinks from 'social-components/utility/post/expandStandaloneAttachmentLinks.js'
+// import combineQuotes from 'social-components/utility/post/combineQuotes.js'
 
 import removeNewLineCharacters from './removeNewLineCharacters.js'
 import setPostLinkUrls from './setPostLinkUrls.js'

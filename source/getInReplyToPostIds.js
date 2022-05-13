@@ -1,5 +1,5 @@
 import parsePostLinks from './parsePostLinks.js'
-import visitPostParts from 'social-components/commonjs/utility/post/visitPostParts.js'
+import visitPostParts from 'social-components/utility/post/visitPostParts.js'
 
 export default function getInReplyToPostIds(post, {
 	boardId,
