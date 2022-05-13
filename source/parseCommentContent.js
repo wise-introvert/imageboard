@@ -1,4 +1,5 @@
 import parseDocument from '../DOMParser'
+import { stringifyElement } from './utility/dom.js'
 
 const NEW_LINE_AROUND = [
 	'div',
@@ -144,7 +145,19 @@ class CommentParser {
 					content.push(result)
 				}
 			} else if (result === null) {
-				console.warn('Unknown comment node type', node)
+				// Outputting `console.warn('Unknown comment node type', node)`
+				// is too lengthy in Node.js because it prints the DOM Element
+				// as a javascript object having various properties.
+				//
+				// Instead, print the `outerHTML` of it.
+				// (`.outerHTML` is not available in Node.js when using `xmldom` package)
+				//
+				// Writing this as a one-liner because the tests expect
+				// a single `console.warn()` call here.
+				//
+				// `1` means "DOM element".
+				//
+				console.warn('Unknown comment node type', node.nodeType === 1 ? (node.outerHTML || stringifyElement(node)) : undefined) // , node)
 				const expandedNodes = Array.prototype.slice.call(node.childNodes)
 				// `1` means "DOM element".
 				if (node.nodeType === 1) {

@@ -1,19 +1,27 @@
-export function setParameters(string, parameters) {
+export function setParametersInString(string, parameters) {
 	for (const key of Object.keys(parameters)) {
 		string = string.replace('{' + key + '}', parameters[key])
 	}
 	return string
 }
 
-export function getParameters(object, params) {
+export function applyParameters(object, params) {
 	const newObject = {}
 	for (const key of Object.keys(object)) {
-		newObject[key] = getParameterValue(object[key], params)
+		if (object[key].if) {
+			const parameterConditions = object[key].if
+			for (const key of Object.keys(parameterConditions)) {
+				if (!matches(params[key], parameterConditions[key])) {
+					continue
+				}
+			}
+		}
+		newObject[key] = getParametrizedValue(object[key], params)
 	}
 	return newObject
 }
 
-export function getParameterValue(parameter, params) {
+export function getParametrizedValue(parameter, params) {
 	if (parameter.value !== undefined) {
 		return parameter.value
 	}
@@ -79,4 +87,24 @@ export function addQueryParameters(url, parameters) {
 			Object.keys(parameters).map(key => `${encodeURIComponent(key)}=${encodeURIComponent(parameters[key])}`).join('&')
 	}
 	return url
+}
+
+function matches(actualValue, expectedValue) {
+	return areEqualArraysOrPrimitives(actualValue, expectedValue)
+}
+
+// https://stackoverflow.com/questions/3115982/how-to-check-if-two-arrays-are-equal-with-javascript/16430730
+function areEqualArraysOrPrimitives(a, b) {
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) {
+      return false
+    }
+    for (let i = 0; i < a.length; i++) {
+      if (!areEqualArraysOrPrimitives(a[i], b[i])) {
+        return false
+      }
+    }
+    return true
+  }
+  return a === b
 }

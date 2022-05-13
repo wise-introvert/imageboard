@@ -15,5 +15,5 @@ function parseKohlchanFlagId(url) {
 	}
 }
 
-// "br".
+// Example: "br".
 const FLAG_ID_COUNTRY_CODE_REGEXP = /^([a-z]{2})$/

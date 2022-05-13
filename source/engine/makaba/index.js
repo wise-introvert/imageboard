@@ -1,19 +1,20 @@
-import Engine from '../../Engine'
+import Engine from '../../Engine.js'
 
-import parseBoardsResponse from './board/parseBoardsResponse'
-import parseThreadsResponse from './thread/parseThreadsResponse'
-import parseThreadsPageResponse from './thread/parseThreadsPageResponse'
-import parseThreadResponse from './thread/parseThreadResponse'
-import parseComment from './comment/parseComment'
-import parseVoteResponse from './vote/parseVoteResponse'
-import parsePostResponse from './post/parsePostResponse'
-import parseReportResponse from './report/parseReportResponse'
+import parseBoardsResponse from './board/parseBoardsResponse.js'
+import parseThreadsResponse from './thread/parseThreadsResponse.js'
+import parseThreadsPageResponse from './thread/parseThreadsPageResponse.js'
+import parseThreadsStatsResponse from './thread/parseThreadsStatsResponse.js'
+import parseThreadResponse from './thread/parseThreadResponse.js'
+import parseComment from './comment/parseComment.js'
+import parseVoteResponse from './vote/parseVoteResponse.js'
+import parsePostResponse from './post/parsePostResponse.js'
+import parseReportResponse from './report/parseReportResponse.js'
 
-import Board from '../../Board'
-import Thread from '../../Thread'
-import Comment from '../../Comment'
+import Board from '../../Board.js'
+import Thread from '../../Thread.js'
+import Comment from '../../Comment.js'
 
-import PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins'
+import PARSE_COMMENT_CONTENT_PLUGINS from './comment/parseCommentContentPlugins.js'
 
 export default class Makaba extends Engine {
 	constructor(chanSettings, options) {
@@ -42,6 +43,15 @@ export default class Makaba extends Engine {
 	parseThreads(response, options) {
 		const { board, threads } = parseThreadsResponse(response)
 		return threads.map(thread => this.createThreadObject(thread, options, { board }))
+	}
+
+	/**
+	 * Parses "get threads list" with stats API response.
+	 * @param  {any} response
+	 * @return {object} Thread stats index
+	 */
+	parseThreadsStats(response) {
+		return parseThreadsStatsResponse(response)
 	}
 
 	/**

@@ -1,9 +1,10 @@
-import unescapeContent from '../../../utility/unescapeContent'
+import unescapeContent from '../../../utility/unescapeContent.js'
 
-import parseAuthorRole from './parseAuthorRole'
-import parseAuthor from './parseAuthor'
-import parseCountryFlagUrl from './parseCountryFlagUrl'
-import parseAttachments from './parseAttachments'
+import parseAuthorRole from './parseAuthorRole.js'
+import parseAuthor from './parseAuthor.js'
+import parseCountryFlagUrl from './parseCountryFlagUrl.js'
+import parseCountryFlagCode from './parseCountryFlagCode.js'
+import parseAttachments from './parseAttachments.js'
 
 /**
  * Parses response comment JSON object.
@@ -69,25 +70,31 @@ export default function parseComment(post, {
 	}
 	// `kohlchan.net` displays comment author country flag
 	// on boards like `/int/`.
+	//
+	// Some "flags" aren't country flags
+	// but rather region flags or even an "Anonymous" flag.
+	// Such "flags" are interpreted as "badges".
+	//
+	// `post.flagCode` is `null` for "Onion" flag:
+	// ```
+	// flag: "/.static/flags/onion.png"
+	// flagCode: null
+	// flagName: "Onion"
+	// ```
+	let country
 	if (post.flag) {
-		const country = parseCountryFlagUrl(post.flag)
-		if (country) {
-			comment.authorCountry = country
-		} else {
-			// Some "flags" aren't country flags
-			// but rather region flags or even an "Anonymous" flag.
-			// Such "flags" are interpreted as "badges".
-			//
-			// `post.flagCode` is `null` for "Onion" flag:
-			// ```
-			// flag: "/.static/flags/onion.png"
-			// flagCode: null
-			// flagName: "Onion"
-			// ```
-			// comment.authorBadgeId = flagId
-			comment.authorBadgeUrl = post.flag
-			comment.authorBadgeName = post.flagName
+		country = parseCountryFlagUrl(post.flag)
+	}
+	if (!country) {
+		if (post.flagCode) {
+			country = parseCountryFlagCode(post.flagCode)
 		}
+	}
+	if (country) {
+		comment.authorCountry = country
+	} else {
+		comment.authorBadgeUrl = post.flag
+		comment.authorBadgeName = post.flagName
 	}
 	return comment
 }

@@ -1,9 +1,8 @@
-require('regenerator-runtime/runtime')
 var fetch = require('node-fetch')
 var imageboard = require('..')
 var getCommentText = require('..').getCommentText
 
-var fourChan = imageboard('4chan', {
+var fourChan = imageboard('8ch', {
   // Sends an HTTP request.
   // Any HTTP request library can be used here.
   // Must return a `Promise` resolving to response text.
@@ -51,7 +50,7 @@ fourChan.getBoards().then((boards) => {
 
   // Prints the first five threads on `/a/` board.
   fourChan.getThreads({
-    boardId: 'a'
+    boardId: boards[0].id
   }).then((threads) => {
     const threadsList = threads.slice(0, 5).map(({
       id,
@@ -79,7 +78,7 @@ fourChan.getBoards().then((boards) => {
 
     // Prints the first five comments of thread #193605320 on `/a/` board.
     fourChan.getThread({
-      boardId: 'a',
+      boardId: boards[0].id,
       threadId: threads[0].id
     }).then((thread) => {
       const commentsList = thread.comments.slice(0, 5).map((comment) => {
@@ -100,7 +99,7 @@ fourChan.getBoards().then((boards) => {
         if (attachments) {
           parts.push(`${attachments.length} attachments`)
         }
-        if (title) {
+        if (replies) {
           parts.push(`${replies.length} replies`)
         }
         return parts.join('\n\n')

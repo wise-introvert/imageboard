@@ -13,6 +13,7 @@
 		"getThread": "/{boardId}/res/{threadId}.json",
 		"getArchivedThread": "/{boardId}/arch/res/{threadId}.json",
 		"getThreads": "/{boardId}/catalog.json",
+		"getThreadsStats": "/{boardId}/threads.json",
 		"getThreadsWithLatestCommentsFirstPage": "/{boardId}/index.json",
 		"getThreadsWithLatestCommentsPage": "/{boardId}/{pageIndex}.json",
 		"getBoards": "/boards.json",
@@ -85,10 +86,34 @@
 					"parameter": "attachments"
 				},
 				"g-recaptcha-response": {
+					"if": {
+						"captchaType": [
+							"recaptcha",
+							"invisible_recaptcha"
+						]
+					},
 					"parameter": "captchaSolution"
 				},
 				"2chaptcha_id": {
+					"if": {
+						"captchaType": [
+							"recaptcha",
+							"invisible_recaptcha"
+						]
+					},
 					"parameter": "captchaId"
+				},
+				"2chcaptcha_id": {
+					"if": {
+						"captchaType": "2chcaptcha"
+					},
+					"parameter": "captchaId"
+				},
+				"2chcaptcha_value": {
+					"if": {
+						"captchaType": "2chcaptcha"
+					},
+					"parameter": "captchaSolution"
 				}
 			}
 		},

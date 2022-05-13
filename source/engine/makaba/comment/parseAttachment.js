@@ -1,5 +1,5 @@
-import getMimeType from '../../../utility/getMimeType'
-import splitFilename from '../../../utility/splitFilename'
+import getMimeType from '../../../utility/getMimeType.js'
+import splitFilename from '../../../utility/splitFilename.js'
 
 const STICKER_FILE_TYPE = 100
 
@@ -128,10 +128,21 @@ function getContentTypeByFileType(type) {
 			return 'image/jpeg'
 		case 2:
 			return 'image/png'
+		case 3:
+			// Animated PNG.
+			return 'image/apng'
 		case 4:
 			return 'image/gif'
+		case 5:
+			return 'image/bmp'
 		case 6:
 			return 'video/webm'
+		case 7:
+			// Disabled.
+			return 'audio/mp3'
+		case 8:
+			// Disabled.
+			return 'application/ogg'
 		case 10:
 			// If an `mp4` audio is uploaded, it's converted
 			// to a `mp4` video with zero `width` and `height`.

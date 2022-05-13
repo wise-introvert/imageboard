@@ -13,6 +13,7 @@ export default function parseThread({
 	unique_posters
 }) {
 	// `num` is a string in `/catalog.json` API response.
+	// `num` is a string also in `/threads.json` API response.
 	if (typeof num === 'string') {
 		num = parseInt(num)
 	}

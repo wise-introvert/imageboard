@@ -1,5 +1,5 @@
-import getMimeType, { getExtension } from '../../../utility/getMimeType'
-import splitFilename from '../../../utility/splitFilename'
+import getMimeType, { getExtension } from '../../../utility/getMimeType.js'
+import splitFilename from '../../../utility/splitFilename.js'
 
 export default function parseAttachment(file, options) {
 	options = {
@@ -138,11 +138,11 @@ function getThumbnailSize(width, height, maxSize) {
 	if (width >= height) {
 		return {
 			width: maxSize,
-			height: maxSize * height / width
+			height: Math.round(maxSize * height / width)
 		}
 	} else {
 		return {
-			width: maxSize * width / height,
+			width: Math.round(maxSize * width / height),
 			height: maxSize
 		}
 	}

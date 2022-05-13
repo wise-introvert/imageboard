@@ -46,20 +46,17 @@ To do:
 npm install imageboard --save
 ```
 
-This library uses `async`/`await` syntax so including `regenerator-runtime/runtime` is required when using it. In Node.js that usually means including `@babel/runtime`. In a web browser that usually means including `@babel/polyfill` (though starting from Babel `7.4.0` `@babel/polyfill` [has been deprecated](https://babeljs.io/docs/en/babel-polyfill) in favor of manually including `core-js/stable` and `regenerator-runtime/runtime`).
-
 ## Example
 
-This example will be using [`fetch()`](https://developer.mozilla.org/docs/Web/API/Fetch_API/Using_Fetch) for making HTTP requests (though any other library could be used). Node.js doesn't have `fetch()` yet so first install a "polyfill" for it, and also install `regenerator-runtime` (because `imageboard` package requires it).
+This example will be using [`fetch()`](https://developer.mozilla.org/docs/Web/API/Fetch_API/Using_Fetch) for making HTTP requests (though any other library could be used). Node.js doesn't have `fetch()` yet so install a "polyfill" for it.
 
 ```
-npm install node-fetch regenerator-runtime/runtime --save
+npm install node-fetch --save
 ```
 
 Then, create an imageboard instance. This example will use `4chan.org` as a data source.
 
 ```js
-require('regenerator-runtime/runtime')
 var fetch = require('node-fetch')
 var imageboard = require('imageboard')
 
