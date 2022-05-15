@@ -22,10 +22,11 @@
     "chai": "^4.3.6",
     "copyfiles": "^2.1.1",
     "mocha": "^10.0.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^3.2.4",
     "npm-run-all": "^1.4.0"
   },
   "scripts": {
+    "test-chan": "node --experimental-json-modules test/test.js",
     "test": "node --experimental-json-modules node_modules/mocha/bin/_mocha --require ./test/setup.js --reporter spec --colors --bail --exit --recursive \"./{,!(node_modules)/**/}*.test.js\"",
     "copy-chan-settings": "cd source && copyfiles chan/**/*.json ../modules && copyfiles chan/**/*.json ../commonjs",
     "build": "npm run copy-chan-settings",

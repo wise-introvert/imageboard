@@ -1,8 +1,9 @@
-var fetch = require('node-fetch')
-var imageboard = require('..')
-var getCommentText = require('..').getCommentText
+import fetch from 'node-fetch'
+import imageboard, { getCommentText } from 'imageboard'
 
-var fourChan = imageboard('8ch', {
+const IMAGEBOARD_ID = '4chan'
+
+const fourChan = imageboard(IMAGEBOARD_ID, {
   // Sends an HTTP request.
   // Any HTTP request library can be used here.
   // Must return a `Promise` resolving to response text.
@@ -14,7 +15,7 @@ var fourChan = imageboard('8ch', {
           response: responseText
         }))
       }
-      var error = new Error(response.statusText)
+      const error = new Error(response.statusText)
       // Set HTTP Response status code on the error.
       error.status = response.status
       throw error
