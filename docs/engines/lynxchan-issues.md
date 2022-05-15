@@ -203,14 +203,6 @@ There's no `signedRole` (thread author role) property on threads in `/catalog.js
 
 Without this info in `/catalog.json` API response, a 3rd-party client won't be able to show that a thread was created by a moderator or an admin in a list of threads on a board.
 
-### No "unique IPs" count on threads in "get thread" API response
-
-There's no "unique poster IP addresses count" property returned when fetching a specific thread.
-
-Without this info, a 3rd-party client won't be able to show how many people participate in a discussion in a thread.
-
-For example, `4chan.org` provides a `unique_ips` property on the first post of a thread when fetching thread info via [`/board/res/threadId.json`](https://a.4cdn.org/a/res/123456789.json).
-
 ### No poster IDs in catalog API response
 
 Some imageboards show poster "unique" IDs on some boards like `4chan.org` does `/int/` or `/pol/`, or like `lynxchan`'s demo site does on [`/lynx/`](https://yeshoney.xyz/lynx) board (example: `Id: 9dbc91` in a comment's header). That is to identify the same author posting several comments in a specific thread, or on the imageboard in general, so that a user would be able to participate in a dialogue with another person, or even hide all of their comments and threads.
