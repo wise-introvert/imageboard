@@ -41,7 +41,7 @@
 		},
 		"post": {
 			"method": "POST",
-			"url": "/makaba/posting.fcgi",
+			"url": "/user/posting",
 			"parameters": {
 				"task": {
 					"value": "post"
@@ -119,11 +119,8 @@
 		},
 		"report": {
 			"method": "POST",
-			"url": "/makaba/makaba.fcgi?json=1",
+			"url": "/user/report",
 			"parameters": {
-				"task": {
-					"value": "report"
-				},
 				"board": {
 					"parameter": "boardId"
 				},
