@@ -778,6 +778,19 @@ posts[0] = {
 	// Is "image limit" reached?
 	"imagelimit": 0,
 
+	// Is the thread closed?
+	"closed": 1,
+
+	// Is the thread archived?
+	"archived": 1,
+
+	// I'd assume `sticky: 1` would be here too in case of a "pinned" thread,
+	// though not confirmed on any real-world example.
+
+	// Does the thread use a custom (board-specific) "spoiler"
+	// image instead of the default one?
+	"custom_spoiler": 1,
+
 	// Total comments count in the thread,
 	// not including the "main" ("original") comment.
 	"replies": 195,
@@ -810,3 +823,5 @@ The auto-refresh algorithm is:
 3. If it is, then there're no missed comments. Append new comments starting from `id > "latest comment ID"`.
 4. If it's not, then it means that since the last "auto-refresh" there have been too much new comments and some of them are missing in `-tail.json`, so perform a full thread refresh.
 5. Update the "latest comment ID" and wait for the next auto-refresh.
+
+I checked some `/a/` and `/b/` threads and the comments count threshold for `-tail.json` file to exist appears to be 101 comments in a thread.

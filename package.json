@@ -11,7 +11,8 @@
     "./DOMParser": {
       "node": "./DOMParser/node.js",
       "default": "./DOMParser/browser.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "sideEffects": false,
   "dependencies": {
@@ -28,8 +29,8 @@
   "scripts": {
     "test-chan": "node --experimental-json-modules test/test.js",
     "test": "node --experimental-json-modules node_modules/mocha/bin/_mocha --require ./test/setup.js --reporter spec --colors --bail --exit --recursive \"./{,!(node_modules)/**/}*.test.js\"",
-    "copy-chan-settings": "cd source && copyfiles chan/**/*.json ../modules && copyfiles chan/**/*.json ../commonjs",
-    "build": "npm run copy-chan-settings",
+    "create-json-js-files": "node scripts/create-json-js-files",
+    "build": "npm-run-all create-json-js-files",
     "prepublishOnly": "npm run build && npm run test"
   },
   "repository": {
