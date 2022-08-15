@@ -806,9 +806,9 @@ posts[0] = {
 	// in this API response.
 	"tail_size": 50,
 
-	// The `id` of the comment which comes before
+	// The `id` of the comment that comes before
 	// the first comment of the "tail".
-	// In other words, the `id` of the last comment
+	// In other words, it's the `id` of the last comment
 	// not included in the "tail" API response.
 	"tail_id": 185788827
 }

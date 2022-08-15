@@ -11,6 +11,7 @@
 	"authResetUrl": "https://2ch.hk/makaba/makaba.fcgi?task=restore",
 	"api": {
 		"getThread": "/{boardId}/res/{threadId}.json",
+		"getThreadIncremental": "/api/mobile/v2/after/{boardId}/{threadId}/{commentId}",
 		"getArchivedThread": "/{boardId}/arch/res/{threadId}.json",
 		"getThreads": "/{boardId}/catalog.json",
 		"getThreadsStats": "/{boardId}/threads.json",
