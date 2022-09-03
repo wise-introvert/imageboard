@@ -17,7 +17,7 @@
 		"getThreadsStats": "/{boardId}/threads.json",
 		"getThreadsWithLatestCommentsFirstPage": "/{boardId}/index.json",
 		"getThreadsWithLatestCommentsPage": "/{boardId}/{pageIndex}.json",
-		"getBoards": "/boards.json",
+		"getBoards": "/api/mobile/v2/boards",
 		"vote": {
 			"method": "GET",
 			"url": "/api/{action}",
