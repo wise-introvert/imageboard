@@ -1,4 +1,4 @@
-0.5.0 / xx.05.2022
+0.5.0 / 12.09.2022
 ==================
 
 * Changed package exports to "ES Modules".
@@ -6,6 +6,35 @@
 * Refactored some code.
 
 * Added some new features.
+
+* Renamed `isArchived` parameter of `getThread()` to `archived`.
+
+* Renamed some properties of `Thread`:
+  * `isSticky` → `onTop`, with an optional `onTopOrder: number` (ex. `makaba` engine)
+  * `isRolling` → `trimming`
+  * `isArchived` → `archived`
+  * `isLocked` → `locked`
+  * `isBumpLimitReached` → `bumpLimitReached`
+  * `isAttachmentLimitReached` → `attachmentLimitReached`
+
+* Renamed some properties of `Board`:
+  * `areSubjectsAllowed` → `features.subject`
+  * `areAttachmentsAllowed` → `features.attachments`
+  * `areTagsAllowed` → `features.tags`
+  * `hasVoting` → `features.votes`
+  * `isSageAllowed` → `features.sage`
+  * `areNamesAllowed` → `features.authorName`
+  * `isTextOnly: true` → `features.attachments: false`
+  * `forceAnonymity: true` → `features.authorName: false`
+  * `isNotSafeForWork` → `notSafeForWork`
+  * `usesShiftJISArt` → `features.shiftJISArt`
+  * `usesCodeTags` → `features.codeTag`
+  * `usesOekaki` → `features.oekaki`
+  * `usesMath` → `features.math`
+
+* Renamed some properties of `Comment`:
+	* `isThreadAuthor` → `authorIsThreadAuthor`
+	* `isSage` → `sage`
 
 0.4.38 / 16.05.2021
 ==================

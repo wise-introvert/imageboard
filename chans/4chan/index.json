@@ -4,7 +4,7 @@
 	"domain": "4chan.org",
 	"domainByBoard": {
 		"*": "boards.4channel.org",
-		"isNotSafeForWork": "boards.4chan.org"
+		"notSafeForWork": "boards.4chan.org"
 	},
 	"defaultAuthorName": "Anonymous",
 	"capcode": {
@@ -71,7 +71,7 @@
 					"parameter": "attachmentFileTag"
 				},
 				"textonly": {
-					"parameter": "isTextOnly"
+					"parameter": "textOnly"
 				},
 				"g-recaptcha-response": {
 					"parameter": "captchaSolution"

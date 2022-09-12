@@ -56,7 +56,7 @@
 				},
 				"op_mark": {
 					"type": "numeric-boolean",
-					"parameter": "isThreadAuthor"
+					"parameter": "authorIsThreadAuthor"
 				},
 				"usercode": {
 					"parameter": "accessToken"

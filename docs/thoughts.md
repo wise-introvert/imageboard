@@ -16,10 +16,10 @@ So, instead of simply erasing them, comments that're being deleted should be rep
 * The IP address hash of the comment author.
 * Perhaps some other non-"private" info (assuming the comment was deleted for privacy reasons).
 
-## Sequential Comment Indexes
+## Persistent Sequential Comment Indexes
 
-This issue is tied directly to the "Deleting Comments"
+This issue is tied directly to the "Deleting Comments" one:
 
-Imageboard engines should also come up with the idea of "autoincrement" per-thread IDs. The currently adopted comment IDs are board-wide while instead they should've been thread-wide. They should also be sequential: the original comment gets a `sequential_id` of `1`, and so on. When a comment gets "deleted", it's not actually "deleted", so the `sequential_id` remains intact. The current "max sequential id" could be stored somewhere in the thread data (`max_sequential_id`). If a thread is a "rolling" ("endless", "recurring", "snake bites its tail") one, then such sequential IDs would still work.
+Imageboard engines should also come up with the idea of "autoincrement" per-thread IDs. The currently adopted comment IDs are board-wide while instead they should've been thread-wide. They should also be sequential: the original comment gets a `sequential_id` of `1`, and so on. When a comment gets "deleted", it's not actually "deleted", so the `sequential_id` remains intact. The current "max sequential id" could be stored somewhere in the thread data (`max_sequential_id`). If a thread is a "trimming" ("endless", "recurring", "snake bites its tail") one, then such sequential IDs would still work.
 
 How could "sequential IDs" be used, apart from them being just a good engineering practice? For example, they could be used to quickly check if there're new comments in a thread. For that, one would first get the latest sequential ID of a thread, and then compare it to the sequential ID of the "latest read" comment in that thread. The difference would yield the count of new comments. This approach wouldn't tell if there're any new "replies", but for just comments that would work.

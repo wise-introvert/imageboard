@@ -181,7 +181,7 @@ One may also refer to `KohlNumbra` client [source code](https://gitgud.io/Tjark/
   // Is the thread sticky.
   pinned: false,
 
-  // Is the thread "rolling".
+  // Is the thread "trimming".
   cyclic: false,
 
   // Is the thread "auto-sage".
@@ -231,7 +231,7 @@ Returns a (brief) list of threads on a board, every thread object having a shape
   // Whether the thread is sticky.
   pinned: false,
 
-  // Whether the thread is "rolling".
+  // Whether the thread is "trimming".
   cyclic: false,
 
   // The URL of the thumbnail of the first image posted in the thread, if any.

@@ -320,7 +320,7 @@ The optional `options` argument can be used to override some of the `options` of
 
 Other available `options`:
 
-* `isArchived` — (optional) Pass `true` when requesting an archived thread. This flag is not required in any way, but, for `makaba` engine, it reduces the number of HTTP Requests from 2 to 1 because in that case it doesn't have to attempt to read the thread by a non-"archived" URL (which returns `404 Not Found`) before attempting to read it by an "archived" URL.
+* `archived` — (optional) Pass `true` when requesting an archived thread. This flag is not required in any way, but, for `makaba` engine, it reduces the number of HTTP Requests from 2 to 1 because in that case it doesn't have to attempt to read the thread by a non-"archived" URL (which returns `404 Not Found`) before attempting to read it by an "archived" URL.
 
 <!--
 ### `parseCommentContent(comment: Comment, { boardId: string, threadId: number })`
@@ -426,47 +426,64 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // Board ID.
   // Example: "b".
   id: string,
+
   // Board title.
   // Example: "Anime & Manga".
   title: string,
+
   // Board description.
   description: string,
+
   // Is this board "Not Safe For Work".
-  isNotSafeForWork: boolean?,
+  notSafeForWork: boolean?,
+
   // "Bump limit" for threads on this board.
   bumpLimit: number?,
+
   // "Comments posted per hour" stats for this board.
   // Is supported by `makaba` and `lynxchan`.
   commentsPerHour: number?,
+
   // The maximum attachments count in a thread.
   // Only present for 4chan.org
   maxAttachmentsInThread: number?,
+
   // Maximum comment length in a thread on the board (a board-wide setting).
   // Only present for `4chan.org`.
   // `2ch.hk` also has it but doesn't return it as part of the `/boards.json` response.
   maxCommentLength: number?,
+
   // Maximum total attachments size in a thread on the board (a board-wide setting).
   // Only present for `4chan.org`.
   // `2ch.hk` also has it but doesn't return it as part of the `/boards.json` response.
   maxAttachmentsSize: number?,
+
   // Maximum total video attachments size in a thread on the board (a board-wide setting).
   // Only present for `4chan.org`.
   maxVideoAttachmentsSize: number?,
+
   // Create new thread cooldown.
   // Only present for `4chan.org`.
   createThreadCooldown: number?,
+
   // Post new comment cooldown.
   // Only present for `4chan.org`.
   postCommentCooldown: number?,
+
   // Post new comment with an attachment cooldown.
   // Only present for `4chan.org`.
   attachFileCooldown: number?,
-  // Whether "sage" is allowed when posting comments on this board.
-  // Only present for `4chan.org`.
-  isSageAllowed: boolean?,
-  // Whether to show a "Name" field in a "post new comment" form on this board.
-  // Only present for `2ch.hk`.
-  areNamesAllowed: boolean?
+
+  // The "features" supported or not supported on this board.
+  features: {
+    // Whether "sage" is allowed when posting comments on this board.
+    // Only present for `4chan.org`.
+    sage: boolean?,
+
+    // Whether to show a "Name" field in a "post new comment" form on this board.
+    // Only present for `2ch.hk`.
+    name: boolean?
+  }
 }
 ```
 
@@ -503,14 +520,17 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // (including the main comment of the thread).
   comments: Comment[],
 
-  // Is this thread "sticky" (pinned).
-  isSticky: boolean?,
+  // Is this thread "sticky" ("pinned") (on top of others).
+  onTop: boolean?,
+  // The order of a "sticky" ("pinned") thread amongst other "sticky" ("pinned") ones.
+  onTopOrder: number?,
 
   // Is this thread locked.
-  isLocked: boolean?,
+  locked: boolean?,
 
-  // A "rolling" thread is the one where old messages are purged as new ones come in.
-  isRolling: boolean?,
+  // A "trimming" thread is one where old messages are purged as new ones come in,
+  // so that the total comments count doesn't exceed a certain threshold.
+  trimming: boolean?,
 
   // On imageboards, threads "expire" due to being pushed off the
   // last page of a board because there haven't been new replies.
@@ -518,26 +538,26 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // rather than just being deleted immediately.
   // Eventually, a thread is deleted from the archive too.
   // If a thread is archived, then it's locked too (by definition).
-  isArchived: boolean?,
+  archived: boolean?,
 
-  // If `isArchived` is `true`, then `archivedAt` date might be defined.
+  // If `archived` is `true`, then `archivedAt` date might be defined.
   // So far, only `4chan`, `makaba` and `lynxchan` seem to have the archive feature.
-  // * `4chan` provides both `isArchived` and `archivedAt` data in thread properties.
+  // * `4chan` provides both `archived` and `archivedAt` data in thread properties.
   // * `makaba` doesn't provide such data, but the code employs some hacks
   //   to find out whether a thread is archived, and, if it is, when has it been archived.
   //   `makaba` requires the `request()` function to return a `{ response, url }` object
-  //   in order to get the `archivedAt` date of an `isArchived` thread.
+  //   in order to get the `archivedAt` date of an `archived` thread.
   // * `lynxchan` allows admins or moderators to manually archive threads,
   //   but doesn't provide `archivedAt` date.
   archivedAt: Date?,
 
   // Was the "bump limit" reached for this thread already.
-  // Is `false` when the thread is "sticky" or "rolling"
+  // Is `false` when the thread is "sticky" or "trimming"
   // because such threads don't expire.
-  isBumpLimitReached: boolean?,
+  bumpLimitReached: boolean?,
 
   // `4chan.org` sets a limit on maximum attachments count in a thread.
-  isAttachmentLimitReached: boolean?,
+  attachmentLimitReached: boolean?,
 
   // `2ch.hk` and `lynxchan` don't specify board settings in `/boards.json` API response.
   // Instead, they return various limits as part of "get threads" or
@@ -571,21 +591,25 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
     // Maximum attachments count for a post.
     maxAttachments: number,
 
-    // (`2ch.hk` only)
-    // Whether this board allows "Subject" when posting a new reply or creating a new thread.
-    areSubjectsAllowed: boolean,
+    // Board "feature" flags.
+    features: {
+      // (`2ch.hk` only)
+      // If this board disallows "Subject" field when posting a new reply
+      // or creating a new thread, this flag is gonna be `false`.
+      subject: boolean,
 
-    // (`2ch.hk` only)
-    // Whether this board allows attachments on posts.
-    areAttachmentsAllowed: boolean,
+      // (`2ch.hk` only)
+      // Whether this board allows attachments on posts.
+      attachments: boolean,
 
-    // (`2ch.hk` only)
-    // Whether this board allows specifying "tags" when creating a new thread.
-    areTagsAllowed: boolean,
+      // (`2ch.hk` only)
+      // Whether this board allows specifying "tags" when creating a new thread.
+      tags: boolean,
 
-    // (`2ch.hk` only)
-    // Whether this board allows voting for comments/threads.
-    hasVoting: boolean,
+      // (`2ch.hk` only)
+      // Whether this board allows voting for comments/threads.
+      votes: boolean
+    },
 
     // (both `lynxchan` and `2ch.hk`)
     // An array of "badges" (like country flags but not country flags)
@@ -638,7 +662,7 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
 
   // `2ch.hk` provides means for "original posters" to identify themselves
   // when replying in their own threads with a previously set "OP" cookie.
-  isThreadAuthor: boolean?,
+  authorIsThreadAuthor: boolean?,
 
   // Some imageboards identify their users by a hash of their IP address subnet
   // on some of their boards (for example, all imageboards do that on `/pol/` boards).
@@ -711,7 +735,7 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
 
   // If this comment was posted with a "sage".
   // https://knowyourmeme.com/memes/sage
-  isSage: boolean?,
+  sage: boolean?,
 
   // Downvotes count for this comment.
   // Only for boards like `/po/` on `2ch.hk`.
@@ -1134,13 +1158,13 @@ var grabbedBoards = Array.prototype.slice.apply(document.querySelectorAll('.link
   .map(node => ({
     id: node.innerHTML.split(' - ')[0].replace('/', '').replace('/', ''),
     title: node.innerHTML.split(' - ')[1],
-    isNotSafeForWork: node.nextSibling.nextSibling.innerHTML === '*NVIP*' ? undefined : true,
+    notSafeForWork: node.nextSibling.nextSibling.innerHTML === '*NVIP*' ? undefined : true,
     category: 'Allgemein'
   }))
 
 grabbedBoards.forEach(board => {
-  if (!board.isNotSafeForWork) {
-    delete board.isNotSafeForWork
+  if (!board.notSafeForWork) {
+    delete board.notSafeForWork
   }
 })
 
