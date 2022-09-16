@@ -453,14 +453,21 @@ This library doesn't parse links to YouTube/Twitter/etc. Instead, this type of f
   // `2ch.hk` also has it but doesn't return it as part of the `/boards.json` response.
   maxCommentLength: number?,
 
-  // Maximum total attachments size in a thread on the board (a board-wide setting).
+  // Maximum attachment size in a thread on the board (a board-wide setting).
   // Only present for `4chan.org`.
-  // `2ch.hk` also has it but doesn't return it as part of the `/boards.json` response.
-  maxAttachmentsSize: number?,
+  maxAttachmentSize: number?,
 
-  // Maximum total video attachments size in a thread on the board (a board-wide setting).
+  // Maximum video attachment size in a thread on the board (a board-wide setting).
   // Only present for `4chan.org`.
-  maxVideoAttachmentsSize: number?,
+  maxVideoAttachmentSize: number?,
+
+  // Maximum video attachment duration (in seconds) in a thread on the board (a board-wide setting).
+  // Only present for `4chan.org`.
+  maxVideoAttachmentDuration: number?,
+
+  // Maximum total attachments size in a thread on the board (a board-wide setting).
+  // Only present for `4chan.org` or `2ch.hk`.
+  maxAttachmentsSize: number?,
 
   // Create new thread cooldown.
   // Only present for `4chan.org`.
