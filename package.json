@@ -13,7 +13,7 @@
   "sideEffects": false,
   "dependencies": {
     "@xmldom/xmldom": "^0.8.2",
-    "social-components": "^0.3.2",
+    "social-components": "^0.3.5",
     "social-components-parser": "^0.2.1"
   },
   "devDependencies": {
