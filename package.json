@@ -12,17 +12,17 @@
   },
   "sideEffects": false,
   "dependencies": {
-    "@xmldom/xmldom": "^0.8.2",
+    "@xmldom/xmldom": "^0.8.6",
     "entities": "^4.4.0",
-    "social-components": "^0.3.5",
+    "social-components": "^0.3.7",
     "social-components-parser": "^0.2.3"
   },
   "devDependencies": {
-    "chai": "^4.3.6",
-    "copyfiles": "^2.1.1",
-    "mocha": "^10.0.0",
-    "node-fetch": "^3.2.4",
-    "npm-run-all": "^1.4.0"
+    "chai": "^4.3.7",
+    "copyfiles": "^2.4.1",
+    "mocha": "^10.2.0",
+    "node-fetch": "^3.3.1",
+    "npm-run-all": "^4.1.5"
   },
   "scripts": {
     "test-chan": "node --experimental-json-modules test/test.js",
